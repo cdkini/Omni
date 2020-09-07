@@ -10,10 +10,8 @@ A lightweight, CLI-based version control system built in Java.
 ```
 /* Abstract class for primary Omni objects, including blobs, trees, and commits */
 public abstract class OmniObject implements Serializable {
-  // Fields
-  
   // Methods
-  public String getType()
+  abstract public String getType();
   
 }
 ```
@@ -79,17 +77,29 @@ public class Commit extends OmniObject implements Serializable {
 
 ## init
 ##### Description:
-##### Usage:
+Creates a new Omni version control system in the current directory by means of initializing a .omni directory. This system will automatically start with one commit: a commit that contains no files and has the commit message initial commit.
+##### Usage: 
+`omni init`
 ##### Complexity:
+<b>O(1)</b> for the creation of the .omni directory
 ##### Failure Cases:
+A .omni directory already exists in the current directory; an error stating <i>“Error: An Omni instance already exists in the current directory.”</i> will be raised.
 ##### Dangers:
+N/A
 
 ## add
 ##### Description:
+Adds a file or directory to the stage to be included in an upcoming commit. If the file had been marked for removal, it is unstaged.
 ##### Usage:
+`omni add [file]`  
+`omni add [dir]`
 ##### Complexity:
+<b>O(N)</b> for the addition of a file or directory to the stage where N is the size of the added object
 ##### Failure Cases:
+- If the file or directory does not exist, an error stating <i>"Error: Added file or directory not found."</i> will be raised.  
+- If the file has not been modified since the last commit, an error stating <i>"Error: Staged file has not been modified since the last commit."</i> will be raised.
 ##### Dangers:
+N/A
 
 ## commit
 ##### Description:
