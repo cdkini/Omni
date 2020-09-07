@@ -12,3 +12,11 @@ This is where you tell us how your code works. For each class, include a high-le
 Persistence
 ---------------------------
 Describe your strategy for ensuring that you don’t lose the state of your program across multiple runs.
+
+
+For each command, list the following:
+  - Description
+  - Runtime(s)
+  - Failure Cases
+  - Dangerous
+  - Implementation
