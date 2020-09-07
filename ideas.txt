@@ -1,0 +1,32 @@
+Commands:
+init
+add
+commit
+rm
+log
+global-log
+find
+status
+checkout
+branch
+rm-branch
+reset
+merge
+
+Objects:
+Commit
+  - Timestamp
+  - Message
+  - List of blobs
+Repo
+  - List of branches
+Branch
+  - List of commits
+Blob
+  - Serialized file contents
+Tree
+  - Seralized directory
+Stage
+  - Where changes made to blobs are stored
+HEAD
+  - Where we are right now (which branch???)
