@@ -4,12 +4,58 @@
 A lightweight, CLI-based version control system built in Java.  
 
 # Classes and Data Structures
-` Include here any class definitions. For each class list the instance variables  and static variables (if any). Include a brief description of each variable     and its purpose in the class. Your explanations in this section should be as concise as possible. Leave the full explanation to the following sections. You  may cut this section short if you find your document is too wordy.`
+` Include here any class definitions. For each class list the instance variables  and static variables (if any). Include a brief description of each variable and its purpose in the class. Your explanations in this section should be as concise as possible. Leave the full explanation to the following sections. You  may cut this section short if you find your document is too wordy.`
 ## Repo
-## OmniObject (ABC)
+## OmniObject
+```
+/* Abstract class for primary Omni objects, including blobs, trees, and commits */
+public abstract class OmniObject implements Serializable {
+  // Fields
+  
+  // Methods
+  
+}
+```
+
 ## Blob
+```
+/* Stores the contents of a single file */
+public class Blob extends OmniObject implements Serializable {
+  // Fields  
+  
+  // Constructor  
+  
+  // Methods  
+  
+}
+```
+
 ## Tree
+```
+/* Stores the contents of a directory. Includes pointers to blobs and other trees contained within */
+public class Tree extends OmniObject implements Serializable {
+  // Fields  
+  
+  // Constructor  
+  
+  // Methods  
+  
+}
+```
+
 ## Commit
+```
+/* Stores metadata about a user commit and points towards a tree to represent a snapshot of the repo */ 
+public class Commit extends OmniObject implements Serializable {
+  // Fields  
+  
+  // Constructor  
+  
+  // Methods  
+  
+}
+```
+
 ## Branch
 ## Stage
 ## HEAD
