@@ -41,7 +41,8 @@ public class Blob extends OmniObject implements Serializable {
 public class Tree extends OmniObject implements Serializable {
   // Fields  
   private String dirName;
-  private ArrayList<OmniObject> children;
+  private ArrayList<Tree> trees;
+  private ArrayList<Blob> blobs;
   
   // Constructor  
   
