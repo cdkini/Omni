@@ -13,6 +13,7 @@ public abstract class OmniObject implements Serializable {
   // Fields
   
   // Methods
+  public String getType()
   
 }
 ```
