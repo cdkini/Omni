@@ -23,10 +23,14 @@ public abstract class OmniObject implements Serializable {
 /* Stores the contents of a single file */
 public class Blob extends OmniObject implements Serializable {
   // Fields  
+  private byte[] contents;
+  private String fileName;
   
   // Constructor  
+  public Blob(File file);
   
-  // Methods  
+  // Methods
+  public String getName();
   
 }
 ```
@@ -36,6 +40,8 @@ public class Blob extends OmniObject implements Serializable {
 /* Stores the contents of a directory. Includes pointers to blobs and other trees contained within */
 public class Tree extends OmniObject implements Serializable {
   // Fields  
+  private String dirName;
+  private ArrayList<OmniObject> children;
   
   // Constructor  
   
@@ -48,7 +54,12 @@ public class Tree extends OmniObject implements Serializable {
 ```
 /* Stores metadata about a user commit and points towards a tree to represent a snapshot of the repo */ 
 public class Commit extends OmniObject implements Serializable {
-  // Fields  
+  // Fields
+  private Tree root;
+  private Commit parent;
+  private String author;
+  private int timeStamp;
+  private String message;
   
   // Constructor  
   
