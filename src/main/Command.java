@@ -1,5 +1,3 @@
-package src.main;
-
 public class Command {
     public static void init() {
         // TODO: FILL IN
