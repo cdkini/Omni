@@ -1,6 +1,12 @@
 package src.main;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 public abstract class OmniObject implements Serializable {
     private String ID;
@@ -22,9 +28,9 @@ public abstract class OmniObject implements Serializable {
     public void serialize(File parent, String fileName) {
         File outFile = new File(parent, fileName);
         try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
-            out.writeObject(this);
-            out.close();
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
+            oos.writeObject(this);
+            oos.close();
         } catch (IOException e) {
             throw new Error("Error when output serialized file.");
         }
@@ -48,9 +54,9 @@ public abstract class OmniObject implements Serializable {
         OmniObject obj;
         File inFile = new File(parent, fileName);
         try {
-            ObjectInputStream inp = new ObjectInputStream(new FileInputStream(inFile));
-            obj = (OmniObject) inp.readObject();
-            inp.close();
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inFile));
+            obj = (OmniObject) ois.readObject();
+            ois.close();
         } catch (IOException | ClassNotFoundException e) {
             throw new Error("IO Error or Class Not Find");
         }

@@ -1,14 +1,12 @@
 package src.main;
 
-import java.io.IOException;
-
 public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");
         }
         try {
-            switch (args[0]) { // Command
+            switch (args[0]) {
                 case "init":
                     Command.init();
                 case "add":
