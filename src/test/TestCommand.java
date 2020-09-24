@@ -20,12 +20,12 @@ public class TestCommand {
     public TemporaryFolder mockDir = new TemporaryFolder();
 
     @Before
-    public void setPath() {
+    public void setUp() {
         mockPath = mockDir.getRoot().getAbsolutePath();
     }
 
     @After
-    public void resetPath() {
+    public void tearDown() {
         mockPath = "";
     }
 
