@@ -6,11 +6,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import src.main.Command;
+import src.main.Utils;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class TestCommand {
@@ -46,8 +50,8 @@ public class TestCommand {
 
     @Test
     public void InitShouldSetProperFileContents() throws IOException {
-        // TODO: Open to implement test!
         Command.init(mockPath);
-        assertTrue(false);
+        byte[] headContents = Utils.readContents(new File(mockPath+".omni/HEAD"));
+        assertEquals(new String(headContents, StandardCharsets.UTF_8), "ref: refs/heads/master\n");
     }
 }

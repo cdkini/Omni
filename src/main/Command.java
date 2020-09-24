@@ -1,5 +1,6 @@
 package src.main;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
@@ -25,8 +26,10 @@ public class Command {
         Files.createDirectory(Paths.get(path+".omni/branches/"));
         Files.createDirectory(Paths.get(path+".omni/refs/"));
         Files.createDirectory(Paths.get(path+".omni/refs/heads"));
-        Files.createFile(Paths.get(path+".omni/HEAD"));
-        // TODO: Write "ref: refs/heads/master" to HEAD
+
+        FileWriter fw = new FileWriter(path+".omni/HEAD");
+        fw.write("ref: refs/heads/master\n");
+        fw.close();
 
         System.out.println("Initialized empty Omni repository in "+
                 Paths.get(".").toAbsolutePath().normalize().toString());
