@@ -3,11 +3,6 @@ package src.main;
 import java.io.File;
 import java.io.IOException;
 import java.io.FilenameFilter;
-import java.io.ObjectOutputStream;
-import java.io.ObjectInputStream;
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -20,7 +15,7 @@ import java.util.List;
 
 /* Assorted utilities.
    @author P. N. Hilfinger */
-class Utils {
+public class Utils {
 
     /* SHA-1 HASH VALUES. */
 
@@ -151,42 +146,5 @@ class Utils {
        a directory. */
     public static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
-    }
-
-    public static void serialize(OmniObject obj, String fileName, File parent) {
-        File outFile = new File(parent, fileName);
-        try {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
-            out.writeObject(obj);
-            out.close();
-        } catch (IOException excp) {
-            throw new Error("Error when output serialized file.");
-        }
-    }
-
-    public static Object deserialize(String fileName, File parent) {
-        OmniObject obj;
-        File inFile = new File(parent, fileName);
-        try {
-            ObjectInputStream inp = new ObjectInputStream(new FileInputStream(inFile));
-            obj = (OmniObject) inp.readObject();
-            inp.close();
-        } catch (IOException | ClassNotFoundException excp) {
-            throw new Error("IO Error or Class Not Find");
-        }
-        return obj;
-    }
-
-    public static byte[] serializeToString(OmniObject obj) {
-        try {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            ObjectOutputStream objectStream = new ObjectOutputStream(stream);
-            objectStream.writeObject(obj);
-            objectStream.close();
-            return stream.toByteArray();
-        } catch (IOException excp) {
-            throw new Error("Internal error serializing commit.");
-        }
-
     }
 }
