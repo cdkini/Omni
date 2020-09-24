@@ -2,23 +2,29 @@ package src.test;
 
 import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import org.junit.rules.TemporaryFolder;
-import org.w3c.dom.ls.LSOutput;
 import src.main.Command;
-
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class TestCommand {
 
     @Rule
-    public TemporaryFolder mockFolder = new TemporaryFolder();
+    public TemporaryFolder mockDir = new TemporaryFolder();
 
     @Test
-    public void testInit() throws IOException {
-        Command.init();
-        System.out.println(mockFolder.getRoot());
+    public void InitWithExistingDirectoryShouldFail() throws IOException {
+        // TODO: Open to implement test!
+        String mockPath = mockDir.getRoot().getAbsolutePath();
+        Command.init(mockPath);
+    }
+
+    @Test
+    public void InitShouldCreateDirectoryAndSubdirectories() throws IOException {
+        // TODO: Open to implement test!
+        String mockPath = mockDir.getRoot().getAbsolutePath();
+        Command.init(mockPath);
     }
 }
