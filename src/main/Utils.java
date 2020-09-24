@@ -26,7 +26,7 @@ class Utils {
 
     /* Returns the SHA-1 hash of the concatenation of VALS, which may be any
        mixture of byte arrays and Strings. */
-    static String sha1(Object... vals) {
+    public static String sha1(Object... vals) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
             for (Object val : vals) {
@@ -49,7 +49,7 @@ class Utils {
     }
 
     /* Returns the SHA-1 hash of the concatenation of the strings in VALS. */
-    static String sha1(List<Object> vals) {
+    public static String sha1(List<Object> vals) {
         return sha1(vals.toArray(new Object[vals.size()]));
     }
 
@@ -59,7 +59,7 @@ class Utils {
        was deleted, and false otherwise.  Refuses to delete FILE and throws
        IllegalArgumentException unless the directory designated by FILE also
        contains a directory named .gitlet. */
-    static boolean restrictedDelete(File file) {
+    public static boolean restrictedDelete(File file) {
         if (!(new File(file.getParentFile(), ".gitlet")).isDirectory()) {
             throw new IllegalArgumentException("not .gitlet working directory");
         }
@@ -74,7 +74,7 @@ class Utils {
        true if FILE was deleted, and false otherwise. Refuses to delete FILE and
        throws IllegalArgumentException unless the directory designated by FILE
        also contains a directory named .gitlet. */
-    static boolean restrictedDelete(String file) {
+    public static boolean restrictedDelete(String file) {
         return restrictedDelete(new File(file));
     }
 
@@ -82,7 +82,7 @@ class Utils {
 
     /* Return the entire contents of FILE as a byte array. FILE must be a normal
        file. Throws IllegalArgumentException in case of problems. */
-    static byte[] readContents(File file) {
+    public static byte[] readContents(File file) {
         if (!file.isFile()) {
             throw new IllegalArgumentException("must be a normal file");
         }
@@ -95,7 +95,7 @@ class Utils {
 
     /* Write the entire contents of BYTES to FILE, creating or overwriting it as
        needed. Throws IllegalArgumentException in case of problems. */
-    static void writeContents(File file, byte[] bytes) {
+    public static void writeContents(File file, byte[] bytes) {
         try {
             if (file.isDirectory()) {
                 throw
@@ -112,14 +112,14 @@ class Utils {
     /* Return the concatenation of FIRST and OTHERS into a File designator,
        analogous to the {@link java.nio.file.Paths.#get(String, String[])}
        method. */
-    static File join(String first, String... others) {
+    public static File join(String first, String... others) {
         return Paths.get(first, others).toFile();
     }
 
     /* Return the concatenation of FIRST and OTHERS into a File designator,
        analogous to the {@link java.nio.file.Paths.#get(String, String[])}
        method. */
-    static File join(File first, String... others) {
+    public static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
     }
 
@@ -136,7 +136,7 @@ class Utils {
     /* Returns a list of the names of all plain files in the directory DIR, in
        lexicographic order as Java Strings. Returns null if DIR does not denote
        a directory. */
-    static List<String> plainFilenamesIn(File dir) {
+    public static List<String> plainFilenamesIn(File dir) {
         String[] files = dir.list(PLAIN_FILES);
         if (files == null) {
             return null;
@@ -149,11 +149,11 @@ class Utils {
     /* Returns a list of the names of all plain files in the directory DIR, in
        lexicographic order as Java Strings. Returns null if DIR does not denote
        a directory. */
-    static List<String> plainFilenamesIn(String dir) {
+    public static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
     }
 
-    static void serialize(OmniObject obj, String fileName, File parent) {
+    public static void serialize(OmniObject obj, String fileName, File parent) {
         File outFile = new File(parent, fileName);
         try {
             ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
@@ -164,7 +164,7 @@ class Utils {
         }
     }
 
-    static Object deserialize(String fileName, File parent) {
+    public static Object deserialize(String fileName, File parent) {
         OmniObject obj;
         File inFile = new File(parent, fileName);
         try {
@@ -177,7 +177,7 @@ class Utils {
         return obj;
     }
 
-    static byte[] serializeToString(OmniObject obj) {
+    public static byte[] serializeToString(OmniObject obj) {
         try {
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             ObjectOutputStream objectStream = new ObjectOutputStream(stream);
