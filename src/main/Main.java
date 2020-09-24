@@ -10,7 +10,7 @@ public class Main {
         try {
             switch (args[0]) { // Command
                 case "init":
-                    Command.init("");
+                    Command.init();
                 case "add":
                     Command.add(args[1]);
                 case "commit":
