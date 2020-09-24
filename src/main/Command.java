@@ -1,6 +1,27 @@
+package src.main;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class Command {
-    public static void init() {
-        // TODO: FILL IN
+    public static void init() throws IOException {
+        if (Files.isDirectory(Paths.get(".omni/"))) {
+            throw new FileAlreadyExistsException("Omni directory already initialized in "+
+                    Paths.get(".").toAbsolutePath().normalize().toString());
+        }
+
+        // Set up skeleton of .omni directory and subdirectories to store data on pwd
+        Files.createDirectory(Paths.get(".omni/"));
+        Files.createDirectory(Paths.get(".omni/objects/"));
+        Files.createDirectory(Paths.get(".omni/branches/"));
+        Files.createDirectory(Paths.get(".omni/refs/"));
+        Files.createFile(Paths.get(".omni/HEAD"));
+
+        System.out.println("Initialized empty Omni repository in "+
+                Paths.get(".").toAbsolutePath().normalize().toString());
     }
 
     public static void add(String filename) {
