@@ -11,4 +11,12 @@ public class Blob extends OmniObject implements Serializable {
         this.contents = Utils.readContents(file);
         this.fileName = file.getName();
     }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public byte[] getContents() {
+        return contents;
+    }
 }
