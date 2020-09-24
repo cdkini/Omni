@@ -1,10 +1,16 @@
 package src.main;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.FilenameFilter;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -12,15 +18,14 @@ import java.util.Formatter;
 import java.util.List;
 
 
-/** Assorted utilities.
- *  @author P. N. Hilfinger
- */
+/* Assorted utilities.
+   @author P. N. Hilfinger */
 class Utils {
 
     /* SHA-1 HASH VALUES. */
 
-    /** Returns the SHA-1 hash of the concatenation of VALS, which may
-     *  be any mixture of byte arrays and Strings. */
+    /* Returns the SHA-1 hash of the concatenation of VALS, which may be any
+       mixture of byte arrays and Strings. */
     static String sha1(Object... vals) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -43,18 +48,17 @@ class Utils {
         }
     }
 
-    /** Returns the SHA-1 hash of the concatenation of the strings in
-     *  VALS. */
+    /* Returns the SHA-1 hash of the concatenation of the strings in VALS. */
     static String sha1(List<Object> vals) {
         return sha1(vals.toArray(new Object[vals.size()]));
     }
 
     /* FILE DELETION */
 
-    /** Deletes FILE if it exists and is not a directory.  Returns true
-     *  if FILE was deleted, and false otherwise.  Refuses to delete FILE
-     *  and throws IllegalArgumentException unless the directory designated by
-     *  FILE also contains a directory named .gitlet. */
+    /* Deletes FILE if it exists and is not a directory.  Returns true if FILE
+       was deleted, and false otherwise.  Refuses to delete FILE and throws
+       IllegalArgumentException unless the directory designated by FILE also
+       contains a directory named .gitlet. */
     static boolean restrictedDelete(File file) {
         if (!(new File(file.getParentFile(), ".gitlet")).isDirectory()) {
             throw new IllegalArgumentException("not .gitlet working directory");
@@ -66,19 +70,18 @@ class Utils {
         }
     }
 
-    /** Deletes the file named FILE if it exists and is not a directory.
-     *  Returns true if FILE was deleted, and false otherwise.  Refuses
-     *  to delete FILE and throws IllegalArgumentException unless the
-     *  directory designated by FILE also contains a directory named .gitlet. */
+    /* Deletes the file named FILE if it exists and is not a directory. Returns
+       true if FILE was deleted, and false otherwise. Refuses to delete FILE and
+       throws IllegalArgumentException unless the directory designated by FILE
+       also contains a directory named .gitlet. */
     static boolean restrictedDelete(String file) {
         return restrictedDelete(new File(file));
     }
 
     /* READING AND WRITING FILE CONTENTS */
 
-    /** Return the entire contents of FILE as a byte array.  FILE must
-     *  be a normal file.  Throws IllegalArgumentException
-     *  in case of problems. */
+    /* Return the entire contents of FILE as a byte array. FILE must be a normal
+       file. Throws IllegalArgumentException in case of problems. */
     static byte[] readContents(File file) {
         if (!file.isFile()) {
             throw new IllegalArgumentException("must be a normal file");
@@ -90,8 +93,8 @@ class Utils {
         }
     }
 
-    /** Write the entire contents of BYTES to FILE, creating or overwriting
-     *  it as needed.  Throws IllegalArgumentException in case of problems. */
+    /* Write the entire contents of BYTES to FILE, creating or overwriting it as
+       needed. Throws IllegalArgumentException in case of problems. */
     static void writeContents(File file, byte[] bytes) {
         try {
             if (file.isDirectory()) {
@@ -104,20 +107,35 @@ class Utils {
         }
     }
 
+    /* OTHER FILE UTILITIES */
+
+    /* Return the concatenation of FIRST and OTHERS into a File designator,
+       analogous to the {@link java.nio.file.Paths.#get(String, String[])}
+       method. */
+    static File join(String first, String... others) {
+        return Paths.get(first, others).toFile();
+    }
+
+    /* Return the concatenation of FIRST and OTHERS into a File designator,
+       analogous to the {@link java.nio.file.Paths.#get(String, String[])}
+       method. */
+    static File join(File first, String... others) {
+        return Paths.get(first.getPath(), others).toFile();
+    }
+
     /* DIRECTORIES */
 
-    /** Filter out all but plain files. */
-    private static final FilenameFilter PLAIN_FILES =
-            new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return new File(dir, name).isFile();
-                }
-            };
+    /* Filter out all but plain files. */
+    private static final FilenameFilter PLAIN_FILES = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            return new File(dir, name).isFile();
+        }
+    };
 
-    /** Returns a list of the names of all plain files in the directory DIR, in
-     *  lexicographic order as Java Strings.  Returns null if DIR does
-     *  not denote a directory. */
+    /* Returns a list of the names of all plain files in the directory DIR, in
+       lexicographic order as Java Strings. Returns null if DIR does not denote
+       a directory. */
     static List<String> plainFilenamesIn(File dir) {
         String[] files = dir.list(PLAIN_FILES);
         if (files == null) {
@@ -128,10 +146,47 @@ class Utils {
         }
     }
 
-    /** Returns a list of the names of all plain files in the directory DIR, in
-     *  lexicographic order as Java Strings.  Returns null if DIR does
-     *  not denote a directory. */
+    /* Returns a list of the names of all plain files in the directory DIR, in
+       lexicographic order as Java Strings. Returns null if DIR does not denote
+       a directory. */
     static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
+    }
+
+    static void serialize(OmniObject obj, String fileName, File parent) {
+        File outFile = new File(parent, fileName);
+        try {
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(outFile));
+            out.writeObject(obj);
+            out.close();
+        } catch (IOException excp) {
+            throw new Error("Error when output serialized file.");
+        }
+    }
+
+    static Object deserialize(String fileName, File parent) {
+        OmniObject obj;
+        File inFile = new File(parent, fileName);
+        try {
+            ObjectInputStream inp = new ObjectInputStream(new FileInputStream(inFile));
+            obj = (OmniObject) inp.readObject();
+            inp.close();
+        } catch (IOException | ClassNotFoundException excp) {
+            throw new Error("IO Error or Class Not Find");
+        }
+        return obj;
+    }
+
+    static byte[] serializeToString(OmniObject obj) {
+        try {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            ObjectOutputStream objectStream = new ObjectOutputStream(stream);
+            objectStream.writeObject(obj);
+            objectStream.close();
+            return stream.toByteArray();
+        } catch (IOException excp) {
+            throw new Error("Internal error serializing commit.");
+        }
+
     }
 }
