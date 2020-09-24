@@ -6,13 +6,13 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class Command {
+public class Command { 
     /**
      * Initializes the .omni directory and its subdirectories and folders in order to store metadata about changes
      * within a given directory.
      *
      * @param path is the relative path to initialize the .omni directory in (empty string defaults to pwd).
-     * @throws IOException if the .omni directory and its contents already exists.
+     * @throws IOException if the .omni directory and its contents already exist.
      */
     public static void init(String path) throws IOException {
         if (Files.isDirectory(Paths.get(path+".omni/"))) {
@@ -31,7 +31,16 @@ public class Command {
         System.out.println("Initialized empty Omni repository in "+
                 Paths.get(".").toAbsolutePath().normalize().toString());
     }
-
+    
+    /**
+     * Works the same as init(String) but defaults to the pwd.
+     *
+     * @see Command#init(String)
+     */
+    public static void init() throws IOException {
+        init("");
+    }
+    
     public static void add(String filename) {
 
     }
