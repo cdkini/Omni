@@ -1,38 +1,44 @@
 package src.main;
 
+import java.io.FileNotFoundException;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");
+        }
+        OmniRepo repo = new OmniRepo();
+        if (!repo.isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
         }
         try {
             switch (args[0]) {
                 case "init":
-                    Command.init();
+                    repo.init();
                 case "add":
-                    Command.add(args[1]);
+                    repo.add(args[1]);
                 case "commit":
-                    Command.commit(args[1]);
+                    repo.commit(args[1]);
                 case "rm":
-                    Command.rm(args[1]);
+                    repo.rm(args[1]);
                 case "log":
-                    Command.log();
+                    repo.log();
                 case "global-log":
-                    Command.globalLog();
+                    repo.globalLog();
                 case "find":
-                    Command.find(args[1]);
+                    repo.find(args[1]);
                 case "status":
-                    Command.status();
+                    repo.status();
                 case "checkout":
                     // TODO: Implement!
                 case "branch":
-                    Command.branch(args[1]);
+                    repo.branch(args[1]);
                 case "rm-branch":
-                    Command.rmBranch(args[1]);
+                    repo.rmBranch(args[1]);
                 case "reset":
-                    Command.reset(args[1]);
+                    repo.reset(args[1]);
                 case "merge":
-                    Command.merge(args[1]);
+                    repo.merge(args[1]);
                 default:
                     throw new IllegalArgumentException("No valid command passed.");
             }

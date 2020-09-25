@@ -2,12 +2,22 @@ package src.main;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
-public class Command { 
+public class OmniRepo {
+    private Stage stage;
+
+    public OmniRepo() {
+        this.stage = new Stage();
+    }
+
+    public boolean isInitialized() {
+        return Files.isDirectory(Paths.get(".omni/"));
+    }
+
     /**
      * Initializes the .omni directory and its subdirectories and folders in order to store metadata about changes
      * within a given directory.
@@ -15,7 +25,7 @@ public class Command {
      * @param path is the relative path to initialize the .omni directory in (empty string defaults to pwd).
      * @throws IOException if the .omni directory and its contents already exist.
      */
-    public static void init(String path) throws IOException {
+    public void init(String path) throws IOException {
         if (Files.isDirectory(Paths.get(path+".omni/"))) {
             throw new FileAlreadyExistsException("Omni directory already initialized in "+
                     Paths.get(".").toAbsolutePath().normalize().toString());
@@ -38,66 +48,83 @@ public class Command {
     /**
      * Works the same as init(String) but defaults to the pwd.
      *
-     * @see Command#init(String)
+     * @see OmniRepo#init(String)
      */
-    public static void init() throws IOException {
+    public void init() throws IOException {
         init("");
     }
-    
-    public static void add(String filename) {
 
+    /**
+     *
+     * @param fileName
+     */
+    public void add(String fileName) {
+        if (stage.isEmpty()) {
+            throw new Error();
+        }
     }
 
-    public static void commit(String msg) {
+    public void commit(String msg) {
         // TODO: FILL IN
     }
 
-    public static void rm(String filename) {
+    public void rm(String filename) {
         // TODO: FILL IN
     }
 
-    public static void log() {
+    public void log() {
         // TODO: FILL IN
     }
 
-    public static void globalLog() {
+    public void globalLog() {
         // TODO: FILL IN
     }
 
-    public static void find(String msg) {
+    public void find(String msg) {
         // TODO: FILL IN
     }
 
-    public static void status() {
+    public void status() {
         // TODO: FILL IN
     }
 
-    public static void checkOutFile(String fileName) {
+    public void checkOutFile(String fileName) {
         // TODO: FILL IN
     }
 
-    public static void checkOutCommit(String commmitID, String filename) {
+    public void checkOutCommit(String commmitID, String filename) {
         // TODO: FILL IN
     }
 
-    public static void checkOutBranch(String branchName) {
+    public void checkOutBranch(String branchName) {
         // TODO: FILL IN
     }
 
-    public static void branch(String branchName) {
+    public void branch(String branchName) {
         // TODO: FILL IN
     }
 
-    public static void rmBranch(String branchName) {
+    public void rmBranch(String branchName) {
         // TODO: FILL IN
     }
 
-    public static void reset(String commitID) {
+    public void reset(String commitID) {
         // TODO: FILL IN
     }
 
-    public static void merge(String branchName) {
+    public void merge(String branchName) {
         // TODO: FILL IN
+    }
+
+    private class Stage {
+        private ArrayList<OmniObject> contents;
+
+        public Stage() {
+            this.contents = new ArrayList<>();
+        }
+
+        public boolean isEmpty() {
+            return contents.isEmpty();
+        }
     }
 }
-
