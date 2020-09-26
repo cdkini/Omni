@@ -66,12 +66,16 @@ public class OmniRepo {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         File file = new File(fileName);
+        if (!file.exists()) {
+            throw new FileNotFoundException(fileName + " did not match any files in current repository");
+        }
         OmniObject obj;
         if (file.isDirectory()) {
             obj = new Tree(file);
         } else {
             obj = new Blob(file);
         }
+        // TODO: Currently does not readContents of directories!
         String sha1 = Utils.sha1((Object) Utils.readContents(file));
         obj.serialize(sha1);
     }
