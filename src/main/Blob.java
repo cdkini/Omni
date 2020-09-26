@@ -3,6 +3,9 @@ package src.main;
 import java.io.File;
 import java.io.Serializable;
 
+/**
+ * Blob (or binary large object) is Omni's internal representation of a single file and its contents.
+ */
 public class Blob extends OmniObject implements Serializable {
     private String fileName;
     private byte[] contents;

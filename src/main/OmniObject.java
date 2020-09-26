@@ -9,7 +9,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * TODO: Updated javadoc!
+ * OmniObject acts as the ABC for the key Omni object types: blobs, trees, and commits.
+ * As such, it includes capabilities shared by all such objects, primarily serialization and deserialization.
  */
 public abstract class OmniObject implements Serializable {
     /**
