@@ -10,5 +10,15 @@ public class Tree extends OmniObject implements Serializable {
     private ArrayList<Blob> blobs;
 
     public Tree(File dir) {
+        this.trees = new ArrayList<>();
+        this.blobs = new ArrayList<>();
+        for (File file: dir.listFiles()) {
+            if (file.isDirectory()) {
+                this.trees.add(new Tree(file));
+            } else {
+                this.blobs.add(new Blob(file));
+            }
+        }
+        this.dirName = dir.getName();
     }
 }
