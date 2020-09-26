@@ -7,38 +7,48 @@ public class Main {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");
         }
-        OmniRepo repo = new OmniRepo();
-        if (!repo.isInitialized()) {
-            throw new FileNotFoundException("Omni directory not initialized");
-        }
+        OmniRepo omniRepo = new OmniRepo();
         try {
             switch (args[0]) {
                 case "init":
-                    repo.init();
+                    omniRepo.init();
+                    break;
                 case "add":
-                    repo.add(args[1]);
+                    omniRepo.add(args[1]);
+                    break;
                 case "commit":
-                    repo.commit(args[1]);
+                    omniRepo.commit(args[1]);
+                    break;
                 case "rm":
-                    repo.rm(args[1]);
+                    omniRepo.rm(args[1]);
+                    break;
                 case "log":
-                    repo.log();
+                    omniRepo.log();
+                    break;
                 case "global-log":
-                    repo.globalLog();
+                    omniRepo.globalLog();
+                    break;
                 case "find":
-                    repo.find(args[1]);
+                    omniRepo.find(args[1]);
+                    break;
                 case "status":
-                    repo.status();
+                    omniRepo.status();
+                    break;
                 case "checkout":
                     // TODO: Implement!
+                    break;
                 case "branch":
-                    repo.branch(args[1]);
+                    omniRepo.branch(args[1]);
+                    break;
                 case "rm-branch":
-                    repo.rmBranch(args[1]);
+                    omniRepo.rmBranch(args[1]);
+                    break;
                 case "reset":
-                    repo.reset(args[1]);
+                    omniRepo.reset(args[1]);
+                    break;
                 case "merge":
-                    repo.merge(args[1]);
+                    omniRepo.merge(args[1]);
+                    break;
                 default:
                     throw new IllegalArgumentException("No valid command passed.");
             }

@@ -1,11 +1,14 @@
 package src.main;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class OmniRepo {
     private Stage stage;
@@ -58,10 +61,19 @@ public class OmniRepo {
      *
      * @param fileName
      */
-    public void add(String fileName) {
-        if (stage.isEmpty()) {
-            throw new Error();
+    public void add(String fileName) throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
         }
+        File file = new File(fileName);
+        OmniObject obj;
+        if (file.isDirectory()) {
+            obj = new Tree(file);
+        } else {
+            obj = new Blob(file);
+        }
+        String sha1 = Utils.sha1((Object) Utils.readContents(file));
+        obj.serialize(sha1);
     }
 
     public void commit(String msg) {

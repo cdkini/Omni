@@ -8,18 +8,10 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+/**
+ * TODO: Updated javadoc!
+ */
 public abstract class OmniObject implements Serializable {
-    private String ID;
-    private static File DIR = new File(".omni");
-
-    /**
-     * TODO: Update javadoc!
-     * @param vals
-     */
-    public void setID(Object... vals) {
-        this.ID = Utils.sha1(vals);
-    }
-
     /**
      * TODO: Update javadoc!
      * @param parent
@@ -41,7 +33,7 @@ public abstract class OmniObject implements Serializable {
      * @param fileName
      */
     public void serialize(String fileName) {
-        serialize(DIR, fileName);
+        serialize(new File(".omni/objects"), fileName);
     }
 
     /**
@@ -69,6 +61,6 @@ public abstract class OmniObject implements Serializable {
      * @return
      */
     public static OmniObject deserialize(String fileName) {
-        return deserialize(fileName, DIR);
+        return deserialize(fileName, new File(".omni/objects"));
     }
 }

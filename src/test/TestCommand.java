@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import src.main.Command;
+import src.main.OmniRepo;
 import src.main.Utils;
 
 import java.io.File;
@@ -21,6 +21,7 @@ public class TestCommand {
     private String mockPath;
 
     @Rule
+    public OmniRepo mockRepo = new OmniRepo();
     public TemporaryFolder mockDir = new TemporaryFolder();
 
     @Before
@@ -36,12 +37,12 @@ public class TestCommand {
     @Test (expected = Exception.class)
     public void InitWithExistingDirectoryShouldFail() throws IOException {
         Files.createDirectory(Paths.get(mockPath+".omni/"));
-        Command.init(mockPath);
+        mockRepo.init(mockPath);
     }
 
     @Test
     public void InitShouldCreateDirectoryAndSubdirectories() throws IOException {
-        Command.init(mockPath);
+        mockRepo.init(mockPath);
         assertTrue(Files.isDirectory(Paths.get(mockPath+".omni/objects/")));
         assertTrue(Files.isDirectory(Paths.get(mockPath+".omni/branches/")));
         assertTrue(Files.isDirectory(Paths.get(mockPath+".omni/refs/heads")));
@@ -50,7 +51,7 @@ public class TestCommand {
 
     @Test
     public void InitShouldSetProperFileContents() throws IOException {
-        Command.init(mockPath);
+        mockRepo.init(mockPath);
         byte[] headContents = Utils.readContents(new File(mockPath+".omni/HEAD"));
         assertEquals(new String(headContents, StandardCharsets.UTF_8), "ref: refs/heads/master\n");
     }
