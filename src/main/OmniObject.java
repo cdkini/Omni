@@ -13,9 +13,10 @@ import java.io.Serializable;
  */
 public abstract class OmniObject implements Serializable {
     /**
-     * TODO: Update javadoc!
-     * @param parent
-     * @param fileName
+     * Serialize converts an object into a stream of bytes and stores it in memory as a file.
+     *
+     * @param parent is the directory that your file is located in.
+     * @param fileName is the name of the file you wish to deserialize.
      */
     public void serialize(File parent, String fileName) {
         File outFile = new File(parent, fileName);
@@ -29,20 +30,22 @@ public abstract class OmniObject implements Serializable {
     }
 
     /**
-     * TODO: Update javadoc!
-     * @param fileName
+     * Works the same as OmniObject.serialize(File, String) but the parent directory defaults to ".omni/objects".
+     *
+     * @see OmniObject#serialize(File, String)
      */
     public void serialize(String fileName) {
         serialize(new File(".omni/objects"), fileName);
     }
 
     /**
-     * TODO: Update javadoc!
-     * @param fileName
-     * @param parent
-     * @return
+     * Deserialize takes the contents of a serialized file and converts it into an instance of an OmniObject.
+     *
+     * @param parent is the directory that your file is located in.
+     * @param fileName is the name of the file you wish to deserialize.
+     * @return either a blob, tree, or commit based on the retrieved encoding.
      */
-    public static OmniObject deserialize(String fileName, File parent) {
+    public static OmniObject deserialize(File parent, String fileName) {
         OmniObject obj;
         File inFile = new File(parent, fileName);
         try {
@@ -56,11 +59,11 @@ public abstract class OmniObject implements Serializable {
     }
 
     /**
-     * TODO: Update javadoc!
-     * @param fileName
-     * @return
+     * Works the same as OmniObject.deserialize(File, String) but the parent directory defaults to ".omni/objects".
+     *
+     * @see OmniObject#deserialize(String)
      */
     public static OmniObject deserialize(String fileName) {
-        return deserialize(fileName, new File(".omni/objects"));
+        return deserialize(new File(".omni/objects"), fileName);
     }
 }

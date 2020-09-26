@@ -49,7 +49,7 @@ public class OmniRepo {
     }
     
     /**
-     * Works the same as init(String) but defaults to the pwd.
+     * Works the same as OmniRepo.init(String) but defaults to the pwd.
      *
      * @see OmniRepo#init(String)
      */
