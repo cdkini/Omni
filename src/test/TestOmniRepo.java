@@ -90,7 +90,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddOfTwoBlobsWithDifferentContentsShouldAddTwicec() throws IOException {
+    public void AddOfTwoBlobsWithDifferentContentsShouldAddTwice() throws IOException {
         mockOmniRepo.init();
         assertEquals(0, mockObjectsDir.list().length);
 

@@ -8,6 +8,8 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OmniRepo {
     private Stage stage;
@@ -61,7 +63,7 @@ public class OmniRepo {
      */
     public void add(String fileName) throws FileNotFoundException {
         File file = (path.isEmpty()) ? new File(fileName) : new File(path, fileName);
-        if (!Files.isDirectory(Paths.get(path+".omni/"))) {
+        if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         if (!file.exists()) {
@@ -76,8 +78,9 @@ public class OmniRepo {
         }
         // TODO: Currently does not readContents of directories!
         // TODO: Open to add file/OmniObject to staging area
-        String sha1 = Utils.sha1(Utils.readContents(file));
-        obj.serialize(new File(path+".omni/objects"), sha1);
+        obj.serialize(new File(path+".omni/objects"), obj.getSHA1(file));
+        stage.add(file.getPath(), obj);
+        // TODO: Check that deserialization works properly for both test and normal applications
     }
 
     public void commit(String msg) {
@@ -132,11 +135,19 @@ public class OmniRepo {
         // TODO: FILL IN
     }
 
+    private boolean isInitialized() {
+        return Files.isDirectory(Paths.get(path+".omni/"));
+    }
+
     private class Stage {
-        private ArrayList<OmniObject> contents;
+        private Map<String, OmniObject> contents;
 
         public Stage() {
-            this.contents = new ArrayList<>();
+            this.contents = new HashMap<>();
+        }
+
+        public void add(String fileName, OmniObject obj) {
+            contents.put(fileName, obj);
         }
 
         public boolean isEmpty() {

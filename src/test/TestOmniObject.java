@@ -23,7 +23,7 @@ public class TestOmniObject {
     @After
     public void tearDown() {
         mockPath = "";
-}
+    }
 
     @Test
     public void BlobTest() throws IOException {
