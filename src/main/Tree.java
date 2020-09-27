@@ -10,11 +10,12 @@ import java.util.ArrayList;
  * control history.
  */
 public class Tree extends OmniObject implements Serializable {
-    private String dirName;
+    private File dir;
     private ArrayList<Tree> trees;
     private ArrayList<Blob> blobs;
 
     public Tree(File dir) {
+        this.dir = dir;
         this.trees = new ArrayList<>();
         this.blobs = new ArrayList<>();
         for (File file: dir.listFiles()) {
@@ -24,11 +25,15 @@ public class Tree extends OmniObject implements Serializable {
                 this.blobs.add(new Blob(file));
             }
         }
-        this.dirName = dir.getName();
     }
 
     @Override
-    public String getSHA1(File file) {
+    public String getSHA1() {
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return dir.getName();
     }
 }

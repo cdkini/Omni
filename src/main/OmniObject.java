@@ -68,5 +68,7 @@ public abstract class OmniObject implements Serializable {
         return deserialize(new File(".omni/objects"), fileName);
     }
 
-    public abstract String getSHA1(File file);
+    public abstract String getSHA1();
+
+    public abstract String getName();
 }

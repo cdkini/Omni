@@ -22,7 +22,12 @@ public class Commit extends OmniObject implements Serializable {
     }
 
     @Override
-    public String getSHA1(File file) {
+    public String getSHA1() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
         return null;
     }
 }
