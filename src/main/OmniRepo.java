@@ -8,27 +8,32 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class OmniRepo {
     private Stage stage;
+    private String path;
 
     public OmniRepo() {
         this.stage = new Stage();
+        this.path = "";
     }
 
-    public boolean isInitialized() {
-        return Files.isDirectory(Paths.get(".omni/"));
+    /*
+    CONSTRUCTOR ONLY USED FOR TESTING
+    path will be temporary directory's relative path
+     */
+    public OmniRepo(String path) {
+        this.stage = new Stage();
+        this.path = path;
     }
 
     /**
      * Initializes the .omni directory and its subdirectories and folders in order to store metadata about changes
      * within a given directory.
      *
-     * @param path is the relative path to initialize the .omni directory in (empty string defaults to pwd).
      * @throws IOException if the .omni directory and its contents already exist.
      */
-    public void init(String path) throws IOException {
+    public void init() throws IOException {
         if (Files.isDirectory(Paths.get(path+".omni/"))) {
             throw new FileAlreadyExistsException("Omni directory already initialized in "+
                     Paths.get(".").toAbsolutePath().normalize().toString());
@@ -47,28 +52,22 @@ public class OmniRepo {
         System.out.println("Initialized empty Omni repository in "+
                 Paths.get(".").toAbsolutePath().normalize().toString());
     }
-    
-    /**
-     * Works the same as OmniRepo.init(String) but defaults to the pwd.
-     *
-     * @see OmniRepo#init(String)
-     */
-    public void init() throws IOException {
-        init("");
-    }
 
     /**
+     * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted file.
      *
-     * @param fileName
+     * @param fileName is the name of the file that's added to the staging area and serialized into a file.
+     * @throws FileNotFoundException if the added file does not exist.
      */
     public void add(String fileName) throws FileNotFoundException {
-        if (!isInitialized()) {
+        File file = (path.isEmpty()) ? new File(fileName) : new File(path, fileName);
+        if (!Files.isDirectory(Paths.get(path+".omni/"))) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
-        File file = new File(fileName);
         if (!file.exists()) {
             throw new FileNotFoundException(fileName + " did not match any files in current repository");
         }
+
         OmniObject obj;
         if (file.isDirectory()) {
             obj = new Tree(file);
@@ -76,8 +75,9 @@ public class OmniRepo {
             obj = new Blob(file);
         }
         // TODO: Currently does not readContents of directories!
-        String sha1 = Utils.sha1((Object) Utils.readContents(file));
-        obj.serialize(sha1);
+        // TODO: Open to add file/OmniObject to staging area
+        String sha1 = Utils.sha1(Utils.readContents(file));
+        obj.serialize(new File(path+".omni/objects"), sha1);
     }
 
     public void commit(String msg) {
