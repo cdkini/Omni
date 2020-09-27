@@ -27,13 +27,23 @@ public class Tree extends OmniObject implements Serializable {
         }
     }
 
+    public Tree(File dir, List objs) {
+        this.dir = dir;
+        this.children = objs;
+    }
+
     public List<OmniObject> getChildren() {
         return children;
     }
 
     @Override
     public String getSHA1() {
-        return Utils.sha1("abc");
+        StringBuilder sha1 = new StringBuilder();
+        sha1.append('T');
+        for (OmniObject obj: children) {
+            sha1.append(obj.getSHA1());
+        }
+        return sha1.toString();
     }
 
     @Override

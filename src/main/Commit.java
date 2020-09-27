@@ -1,9 +1,7 @@
 package src.main;
 
-import src.main.OmniObject;
-
-import java.io.File;
 import java.io.Serializable;
+import java.util.Date;
 
 /*
  * Commit is Omni's internal representation of a snapshot of a repository and its staged files at a particular point in
@@ -14,16 +12,20 @@ public class Commit extends OmniObject implements Serializable {
     private Tree root;
     private Commit parent;
     private String author;
-    private int timeStamp;
+    private long timeStamp;
     private String message;
 
-    public Commit(File f) {
-
+    public Commit(Tree root, Commit parent, String message) {
+        this.root = root;
+        this.parent = parent;
+        this.author = "Chetan";
+        this.timeStamp = new Date().getTime();
+        this.message = message;
     }
 
     @Override
-    public String getSHA1() {
-        return null;
+    public String getSHA1()  {
+        return "C"+Utils.sha1(root.getSHA1());
     }
 
     @Override

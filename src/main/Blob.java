@@ -17,7 +17,7 @@ public class Blob extends OmniObject implements Serializable {
 
     @Override
     public String getSHA1() {
-        return Utils.sha1(Utils.readContents(file));
+        return "B"+Utils.sha1(Utils.readContents(file));
     }
 
     @Override
