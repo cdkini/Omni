@@ -27,6 +27,11 @@ public class Commit extends OmniObject implements Serializable {
     }
 
     @Override
+    public String getPath() {
+        return null;
+    }
+
+    @Override
     public String getName() {
         return null;
     }
