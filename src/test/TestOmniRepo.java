@@ -8,10 +8,7 @@ import org.junit.rules.TemporaryFolder;
 import src.main.OmniRepo;
 import src.main.Utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -172,6 +169,28 @@ public class TestOmniRepo {
     public void AddNonExistingFileShouldFail() throws IOException {
         mockOmniRepo.init();
         mockOmniRepo.add("foo.txt");
+    }
+
+    // __________________________________OmniRepo.commit________________________________________________________________
+
+    @Test
+    public void CommitOfStagedFileShouldSerializeInObjectsDir() throws IOException {
+        mockOmniRepo.init();
+        File mockFile = mockDir.newFile("foo.txt");
+        mockOmniRepo.add("foo.txt");
+        mockOmniRepo.commit("Committed foo!");
+        assertEquals(3, mockObjectsDir.list().length);
+    }
+
+    @Test (expected = Exception.class)
+    public void CommitOfEmptyStageShouldFail() throws IOException {
+        mockOmniRepo.init();
+        mockOmniRepo.commit("Commit message.");
+    }
+
+    @Test (expected = Exception.class)
+    public void CommitOfUnitializedDirectoryShouldFail() throws FileNotFoundException {
+        mockOmniRepo.commit("Commit message.");
     }
 
     // __________________________________OmniRepo.rm____________________________________________________________________

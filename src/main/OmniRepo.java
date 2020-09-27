@@ -7,16 +7,16 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 
 public class OmniRepo {
     private Stage stage;
     private String path;
+    private File objectsDir;
 
     public OmniRepo(String path) {
-        this.stage = new Stage();
+        this.stage = new Stage(path);
         this.path = path;
+        this.objectsDir = new File(path, "/.omni/objects");
     }
 
     /**
@@ -59,7 +59,6 @@ public class OmniRepo {
             throw new FileNotFoundException(file.getName() + " did not match any files in current repository");
         }
 
-        File objectsDir = new File(path, "/.omni/objects");
         if (file.isDirectory()) {
             Tree tree = new Tree(file);
             for (OmniObject child: tree.getChildren()) {
@@ -74,8 +73,24 @@ public class OmniRepo {
         }
     }
 
-    public void commit(String msg) {
-        // TODO: FILL IN
+    public void commit(String message) throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        if (stage.isEmpty()) {
+            throw new IllegalStateException("No changes added to commit (use 'omni add')");
+        }
+
+        File pwd = new File(System.getProperty("user.dir")+path);
+        Tree root = new Tree(pwd, stage.getObjects());
+        Commit commit = new Commit(root, stage.getHead(), message);
+
+        root.serialize(objectsDir, root.getSHA1());
+        commit.serialize(objectsDir, commit.getSHA1());
+        stage.setHead(commit);
+
+        //TODO: Currently does not have persistence between commands! The stage will revert to empty between
+        // usages of the script. Open to add interaction with index to obtain state of Omni directory.
     }
 
     public void rm(String filename) {
@@ -128,21 +143,5 @@ public class OmniRepo {
 
     private boolean isInitialized() {
         return Files.isDirectory(Paths.get(path, "/.omni/"));
-    }
-
-    private class Stage {
-        private Map<String, OmniObject> contents;
-
-        public Stage() {
-            this.contents = new HashMap<>();
-        }
-
-        public void add(String fileName, OmniObject obj) {
-            contents.put(fileName, obj);
-        }
-
-        public boolean isEmpty() {
-            return contents.isEmpty();
-        }
     }
 }
