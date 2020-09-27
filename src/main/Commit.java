@@ -20,4 +20,9 @@ public class Commit extends OmniObject implements Serializable {
     public Commit(File f) {
 
     }
+
+    @Override
+    public String getSHA1(File file) {
+        return null;
+    }
 }

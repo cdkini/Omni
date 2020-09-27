@@ -26,4 +26,9 @@ public class Tree extends OmniObject implements Serializable {
         }
         this.dirName = dir.getName();
     }
+
+    @Override
+    public String getSHA1(File file) {
+        return null;
+    }
 }
