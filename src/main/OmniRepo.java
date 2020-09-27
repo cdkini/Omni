@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,15 +14,6 @@ public class OmniRepo {
     private Stage stage;
     private String path;
 
-    public OmniRepo() {
-        this.stage = new Stage();
-        this.path = "";
-    }
-
-    /*
-    CONSTRUCTOR ONLY USED FOR TESTING
-    path will be temporary directory's relative path
-     */
     public OmniRepo(String path) {
         this.stage = new Stage();
         this.path = path;
@@ -36,18 +26,18 @@ public class OmniRepo {
      * @throws IOException if the .omni directory and its contents already exist.
      */
     public void init() throws IOException {
-        if (Files.isDirectory(Paths.get(path+".omni/"))) {
+        if (Files.isDirectory(Paths.get(path, "/.omni/"))) {
             throw new FileAlreadyExistsException("Omni directory already initialized in "+
                     Paths.get(".").toAbsolutePath().normalize().toString());
         }
 
-        Files.createDirectory(Paths.get(path+".omni/"));
-        Files.createDirectory(Paths.get(path+".omni/objects/"));
-        Files.createDirectory(Paths.get(path+".omni/branches/"));
-        Files.createDirectory(Paths.get(path+".omni/refs/"));
-        Files.createDirectory(Paths.get(path+".omni/refs/heads"));
+        Files.createDirectory(Paths.get(path, "/.omni/"));
+        Files.createDirectory(Paths.get(path, "/.omni/objects/"));
+        Files.createDirectory(Paths.get(path, "/.omni/branches/"));
+        Files.createDirectory(Paths.get(path, "/.omni/refs/"));
+        Files.createDirectory(Paths.get(path, "/.omni/refs/heads"));
 
-        FileWriter fw = new FileWriter(path+".omni/HEAD");
+        FileWriter fw = new FileWriter(path+"/.omni/HEAD");
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
@@ -56,13 +46,13 @@ public class OmniRepo {
     }
 
     /**
-     * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted file.
+     * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted hash.
      *
      * @param fileName is the name of the file that's added to the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
      */
     public void add(String fileName) throws FileNotFoundException {
-        File file = (path.isEmpty()) ? new File(fileName) : new File(path, fileName);
+        File file = new File(path, fileName);
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
@@ -77,8 +67,8 @@ public class OmniRepo {
             obj = new Blob(file);
         }
         // TODO: Currently does not readContents of directories!
-        // TODO: Open to add file/OmniObject to staging area
-        obj.serialize(new File(path+".omni/objects"), obj.getSHA1(file));
+        File objectsDir = new File(path, "/.omni/objects");
+        obj.serialize(objectsDir, obj.getSHA1());
         stage.add(file.getPath(), obj);
         // TODO: Check that deserialization works properly for both test and normal applications
     }
@@ -136,7 +126,7 @@ public class OmniRepo {
     }
 
     private boolean isInitialized() {
-        return Files.isDirectory(Paths.get(path+".omni/"));
+        return Files.isDirectory(Paths.get(path, "/.omni/"));
     }
 
     private class Stage {
