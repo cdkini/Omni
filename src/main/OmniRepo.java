@@ -41,8 +41,7 @@ public class OmniRepo {
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
-        System.out.println("Initialized empty Omni repository in "+
-                Paths.get(".").toAbsolutePath().normalize().toString());
+        System.out.println("Initialized empty Omni repository in "+System.getProperty("user.dir")+path);
     }
 
     /**
@@ -57,20 +56,22 @@ public class OmniRepo {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         if (!file.exists()) {
-            throw new FileNotFoundException(fileName + " did not match any files in current repository");
+            throw new FileNotFoundException(file.getName() + " did not match any files in current repository");
         }
 
-        OmniObject obj;
-        if (file.isDirectory()) {
-            obj = new Tree(file);
-        } else {
-            obj = new Blob(file);
-        }
-        // TODO: Currently does not readContents of directories!
         File objectsDir = new File(path, "/.omni/objects");
-        obj.serialize(objectsDir, obj.getSHA1());
-        stage.add(file.getPath(), obj);
-        // TODO: Check that deserialization works properly for both test and normal applications
+        if (file.isDirectory()) {
+            Tree tree = new Tree(file);
+            for (OmniObject child: tree.getChildren()) {
+                add(tree.getName()+"/"+child.getName());
+            }
+            tree.serialize(objectsDir, tree.getSHA1());
+            stage.add(tree.getPath(), tree);
+        } else {
+            Blob blob = new Blob(file);
+            blob.serialize(objectsDir, blob.getSHA1());
+            stage.add(blob.getPath(), blob);
+        }
     }
 
     public void commit(String msg) {
