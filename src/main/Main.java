@@ -7,7 +7,6 @@ public class Main {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");
         }
-        System.out.println(System.getProperty("user.dir"));
         OmniRepo omniRepo = new OmniRepo(System.getProperty("user.dir"));
         try {
             switch (args[0]) {

@@ -21,6 +21,11 @@ public class Blob extends OmniObject implements Serializable {
     }
 
     @Override
+    public String getPath() {
+        return file.getAbsolutePath();
+    }
+
+    @Override
     public String getName() {
         return file.getName();
     }

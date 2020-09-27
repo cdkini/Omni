@@ -2,7 +2,9 @@ package src.main;
 
 import java.io.File;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 /*
  * Tree is Omni's internal representation of a directory and its contents. A single tree can contain pointers to
@@ -11,25 +13,32 @@ import java.util.ArrayList;
  */
 public class Tree extends OmniObject implements Serializable {
     private File dir;
-    private ArrayList<Tree> trees;
-    private ArrayList<Blob> blobs;
+    private List<OmniObject> children;
 
     public Tree(File dir) {
         this.dir = dir;
-        this.trees = new ArrayList<>();
-        this.blobs = new ArrayList<>();
+        this.children = new ArrayList<OmniObject>();
         for (File file: dir.listFiles()) {
             if (file.isDirectory()) {
-                this.trees.add(new Tree(file));
+                this.children.add(new Tree(file));
             } else {
-                this.blobs.add(new Blob(file));
+                this.children.add(new Blob(file));
             }
         }
     }
 
+    public List<OmniObject> getChildren() {
+        return children;
+    }
+
     @Override
     public String getSHA1() {
-        return null;
+        return Utils.sha1("abc");
+    }
+
+    @Override
+    public String getPath() {
+        return dir.getAbsolutePath();
     }
 
     @Override

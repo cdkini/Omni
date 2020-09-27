@@ -1,5 +1,7 @@
 package src.main;
 
+import jdk.jshell.spi.ExecutionControl;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,6 +23,17 @@ public abstract class OmniObject implements Serializable {
      */
     public void serialize(File parent, String fileName) {
         File outFile = new File(parent, fileName);
+        if (outFile.isDirectory()) {
+            for (File file: outFile.listFiles()) {
+                if (file.isDirectory()) {
+                    Tree tree = new Tree(file);
+                    tree.serialize(parent, tree.getSHA1());
+                } else {
+                    Blob blob = new Blob(file);
+                    blob.serialize(parent, blob.getSHA1());
+                }
+            }
+        }
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
             oos.writeObject(this);
@@ -28,15 +41,6 @@ public abstract class OmniObject implements Serializable {
         } catch (IOException e) {
             throw new Error("Error when output serialized file.");
         }
-    }
-
-    /**
-     * Works the same as OmniObject.serialize(File, String) but the parent directory defaults to ".omni/objects".
-     *
-     * @see OmniObject#serialize(File, String)
-     */
-    public void serialize(String fileName) {
-        serialize(new File(".omni/objects"), fileName);
     }
 
     /**
@@ -59,16 +63,7 @@ public abstract class OmniObject implements Serializable {
         return obj;
     }
 
-    /**
-     * Works the same as OmniObject.deserialize(File, String) but the parent directory defaults to ".omni/objects".
-     *
-     * @see OmniObject#deserialize(String)
-     */
-    public static OmniObject deserialize(String fileName) {
-        return deserialize(new File(".omni/objects"), fileName);
-    }
-
-    public abstract String getSHA1();
-
+    public abstract String getPath();
     public abstract String getName();
+    public abstract String getSHA1();
 }
