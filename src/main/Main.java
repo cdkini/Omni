@@ -1,9 +1,10 @@
 package src.main;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");
         }
@@ -55,5 +56,6 @@ public class Main {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        omniRepo.saveState();
     }
 }

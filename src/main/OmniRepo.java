@@ -9,14 +9,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class OmniRepo {
-    private Stage stage;
     private String path;
-    private File objectsDir;
+    private Stage stage;
+    private final File mainDir;
+    private final File objectsDir;
 
-    public OmniRepo(String path) {
-        this.stage = new Stage(path);
+    public OmniRepo(String path) throws FileNotFoundException {
         this.path = path;
+        this.stage = new Stage(path);
+        this.mainDir = new File(path, "/.omni");
         this.objectsDir = new File(path, "/.omni/objects");
+    }
+
+    public void saveState() throws IOException {
+        stage.writeContentsToIndex();
     }
 
     /**
