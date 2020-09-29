@@ -63,6 +63,10 @@ public abstract class OmniObject implements Serializable {
         return obj;
     }
 
+    public String toString() {
+        return getSHA1();
+    }
+
     public abstract String getPath();
     public abstract String getName();
     public abstract String getSHA1();
