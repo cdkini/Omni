@@ -16,6 +16,9 @@ public class Tree extends OmniObject implements Serializable {
     private List<OmniObject> children;
 
     public Tree(File dir) {
+        if (!dir.isDirectory()) {
+            throw new IllegalArgumentException("File argument must be a directory");
+        }
         this.dir = dir;
         this.children = new ArrayList<OmniObject>();
         for (File file: dir.listFiles()) {
@@ -28,6 +31,9 @@ public class Tree extends OmniObject implements Serializable {
     }
 
     public Tree(File dir, List objs) {
+        if (!dir.isDirectory()) {
+            throw new IllegalArgumentException("File argument must be a directory");
+        }
         this.dir = dir;
         this.children = objs;
     }
