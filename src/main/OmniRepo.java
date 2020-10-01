@@ -86,9 +86,9 @@ public class OmniRepo {
         if (stage.isEmpty()) {
             throw new IllegalStateException("No changes added to commit (use 'omni add')");
         }
-
-        File pwd = new File(System.getProperty("user.dir")+path);
-        Tree root = new Tree(pwd, stage.getObjects());
+        String pwdPath = System.getProperty("user.dir") + path;
+        new File(pwdPath).mkdirs();
+        Tree root = new Tree(new File(pwdPath), stage.getObjects());
         Commit commit = new Commit(root, stage.getHead(), message);
 
         root.serialize(objectsDir, root.getSHA1());

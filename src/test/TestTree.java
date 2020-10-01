@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import src.main.Blob;
 import src.main.Tree;
 
 import java.io.File;
@@ -46,15 +45,16 @@ public class TestTree {
     }
 
     @Test
-    public void instantiationOfTreeWithNestedFilesShouldAddToChildren() {
+    public void instantiationfileOfTreeWithNestedFilesShouldAddToChildren() throws IOException {
         // TODO: Open to add test!
         assertTrue(false);
     }
 
     @Test
     public void serializeTreeShouldCreateHashFile() {
-        // TODO: Open to add test!
-        assertTrue(false);
+        Tree mockTree = new Tree(mockNestedDir);
+        mockTree.serialize(mockDir.getRoot(), "res");
+        assertTrue(Files.exists(Paths.get(mockDirPath, "res")));
     }
 
     @Test
