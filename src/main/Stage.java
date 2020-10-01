@@ -1,24 +1,28 @@
 package src.main;
 
+import org.json.JSONObject;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 public class Stage {
     private String path;
     private Commit head;
-    private Commit currBranch;
+    private Commit branch;
     private Map<String, OmniObject> contents;
 
-    public Stage(String path) throws FileNotFoundException {
+    public Stage(String path) {
         this.path = path;
+        this.head = null;
+        this.branch = null;
+        this.contents = new HashMap<>();
         File index = new File(path, ".omni/index");
-        Scanner scanner = new Scanner(index);
+//        Scanner scanner = new Scanner(index);
         // TODO: Fix reading and creation of attribute objects
 //        while (scanner.hasNextLine()) {
 //            String line = scanner.nextLine();
@@ -32,17 +36,21 @@ public class Stage {
 //        }
     }
 
-    public void add(String fileName, OmniObject obj) {
-        contents.put(fileName, obj);
+    public void writeContentsToIndex() throws IOException {
+        JSONObject obj = new JSONObject();
+        obj.put("head", head);
+        obj.put("branch", branch);
+        obj.put("contents", contents);
+
+        File index = new File(path,".omni/index");
+        FileWriter fw = new FileWriter(index);
+        fw.write(obj.toString());
+        fw.flush();
+        fw.close();
     }
 
-    public void writeContentsToIndex() throws IOException {
-        File index = new File(path,".omni/index");
-        FileWriter fw = new FileWriter(index, false);
-        fw.write("head: "+head+"\n");
-        fw.write("branch: "+currBranch+"\n");
-        fw.write("contents: "+contents);
-        fw.close();
+    public void add(String fileName, OmniObject obj) {
+        contents.put(fileName, obj);
     }
 
     public List<OmniObject> getObjects() {

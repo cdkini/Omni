@@ -25,7 +25,7 @@ public class TestOmniRepo {
     public TemporaryFolder mockDir = new TemporaryFolder();
 
     @Before
-    public void setUp() {
+    public void setUp() throws FileNotFoundException {
         mockDirPath = mockDir.getRoot().getAbsolutePath();
         mockOmniRepo = new OmniRepo(mockDirPath);
         mockObjectsDir = new File(mockDirPath, ".omni/objects");
