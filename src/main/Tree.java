@@ -13,7 +13,7 @@ import java.util.List;
  */
 public class Tree extends OmniObject implements Serializable {
     private File dir;
-    private List<OmniObject> children;
+    private ArrayList<OmniObject> children;
 
     public Tree(File dir) {
         if (!dir.isDirectory()) {
@@ -30,7 +30,7 @@ public class Tree extends OmniObject implements Serializable {
         }
     }
 
-    public Tree(File dir, List objs) {
+    public Tree(File dir, ArrayList objs) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File argument must be a directory");
         }
@@ -38,7 +38,7 @@ public class Tree extends OmniObject implements Serializable {
         this.children = objs;
     }
 
-    public List<OmniObject> getChildren() {
+    public ArrayList<OmniObject> getChildren() {
         return children;
     }
 

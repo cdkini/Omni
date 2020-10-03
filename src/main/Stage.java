@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +54,7 @@ public class Stage {
         contents.put(fileName, obj);
     }
 
-    public List<OmniObject> getObjects() {
+    public ArrayList<OmniObject> getObjects() {
         return new ArrayList<>(contents.values());
     }
 
