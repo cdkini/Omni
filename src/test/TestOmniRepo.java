@@ -55,7 +55,7 @@ public class TestOmniRepo {
     // OmniRepo.init____________________________________________________________________________________________________
 
     @Test
-    public void InitShouldCreateDirectoryAndSubdirectories() throws IOException {
+    public void initShouldCreateDirectoryAndSubdirectories() throws IOException {
         mockOmniRepo.init();
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/objects/")));
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/branches/")));
@@ -65,14 +65,14 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void InitShouldSetProperFileContents() throws IOException {
+    public void initShouldSetProperFileContents() throws IOException {
         mockOmniRepo.init();
         byte[] headContents = Utils.readContents(new File(mockDirPath, "/.omni/HEAD"));
         assertEquals(new String(headContents, StandardCharsets.UTF_8), "ref: refs/heads/master\n");
     }
 
     @Test(expected = Exception.class)
-    public void InitWithExistingDirectoryShouldFail() throws IOException {
+    public void initWithExistingDirectoryShouldFail() throws IOException {
         Files.createDirectory(Paths.get(mockDirPath, "/.omni/"));
         mockOmniRepo.init();
     }
@@ -80,7 +80,7 @@ public class TestOmniRepo {
     // OmniRepo.add_____________________________________________________________________________________________________
 
     @Test
-    public void AddShouldSerializeBlobInObjectsDir() throws IOException {
+    public void addShouldSerializeBlobInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
         mockOmniRepo.add("foo.txt");
@@ -88,7 +88,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddOfTwoBlankBlobsShouldOnlyAddOnce() throws IOException {
+    public void addOfTwoBlankBlobsShouldOnlyAddOnce() throws IOException {
         mockOmniRepo.init();
         String[] fileNames = {"foo.txt", "bar.txt"};
         for (int i = 0; i < fileNames.length; i++) {
@@ -99,7 +99,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddOfTwoBlobsWithDifferentContentsShouldAddTwice() throws IOException {
+    public void addOfTwoBlobsWithDifferentContentsShouldAddTwice() throws IOException {
         mockOmniRepo.init();
 
         String[] fileNames = {"foo.txt", "bar.txt"};
@@ -116,7 +116,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddOfTwoBlobsWithIdenticalContentsShouldOnlyAddOnce() throws IOException {
+    public void addOfTwoBlobsWithIdenticalContentsShouldOnlyAddOnce() throws IOException {
         mockOmniRepo.init();
 
         String[] fileNames = {"foo.txt", "bar.txt"};
@@ -132,7 +132,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddShouldSerializeTreeInObjectsDir() throws IOException {
+    public void addShouldSerializeTreeInObjectsDir() throws IOException {
         mockOmniRepo.init();
 
         File mockFolder = mockDir.newFolder("Temp");
@@ -151,7 +151,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void AddOfTreeWithSameContentsShouldOnlyAddOnce() throws IOException {
+    public void addOfTreeWithSameContentsShouldOnlyAddOnce() throws IOException {
         mockOmniRepo.init();
 
         String[] dirNames = {"TempA", "TempB"};
@@ -175,13 +175,13 @@ public class TestOmniRepo {
     }
 
     @Test (expected = Exception.class)
-    public void AddToUninitializedDirectoryShouldFail() throws IOException {
+    public void addToUninitializedDirectoryShouldFail() throws IOException {
         File mockFile = mockDir.newFile("foo.txt");
         mockOmniRepo.add("foo.txt");
     }
 
     @Test (expected = Exception.class)
-    public void AddNonExistingFileShouldFail() throws IOException {
+    public void addNonExistingFileShouldFail() throws IOException {
         mockOmniRepo.init();
         mockOmniRepo.add("foo.txt");
     }
@@ -189,7 +189,7 @@ public class TestOmniRepo {
     // OmniRepo.commit__________________________________________________________________________________________________
 
     @Test
-    public void CommitOfStagedFileShouldSerializeInObjectsDir() throws IOException {
+    public void commitOfStagedFileShouldSerializeInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
         mockOmniRepo.add("foo.txt");
@@ -198,13 +198,13 @@ public class TestOmniRepo {
     }
 
     @Test (expected = Exception.class)
-    public void CommitOfEmptyStageShouldFail() throws IOException {
+    public void commitOfEmptyStageShouldFail() throws IOException {
         mockOmniRepo.init();
         mockOmniRepo.commit("Commit message.");
     }
 
     @Test (expected = Exception.class)
-    public void CommitOfUnitializedDirectoryShouldFail() throws FileNotFoundException {
+    public void commitOfUnitializedDirectoryShouldFail() throws FileNotFoundException {
         mockOmniRepo.commit("Commit message.");
     }
 
