@@ -38,6 +38,20 @@ public class TestOmniRepo {
         mockObjectsDir = null;
     }
 
+    // Miscellaneous____________________________________________________________________________________________________
+
+    @Test
+    public void saveStateShouldCreateIndex() throws IOException {
+        mockOmniRepo.init();
+        mockOmniRepo.saveState();
+        assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/index")));
+    }
+
+    @Test
+    public void saveStageShouldOverwriteExistingIndex() throws IOException {
+        assertTrue(false);
+    }
+
     // OmniRepo.init____________________________________________________________________________________________________
 
     @Test
@@ -47,6 +61,7 @@ public class TestOmniRepo {
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/branches/")));
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/refs/heads")));
         assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/HEAD")));
+        assertTrue(Files.exists(Paths.get(mockDirPath,"/.omni/index")));
     }
 
     @Test
