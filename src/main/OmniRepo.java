@@ -100,9 +100,6 @@ public class OmniRepo {
         root.serialize(objectsDir, root.getSHA1());
         commit.serialize(objectsDir, commit.getSHA1());
         stage.setHead(commit);
-
-        //TODO: Currently does not have persistence between commands! The stage will revert to empty between
-        // usages of the script. Open to add interaction with index to obtain state of Omni directory.
     }
 
     public void rm(String filename) {

@@ -11,14 +11,12 @@ import java.util.Date;
 public class Commit extends OmniObject implements Serializable {
     private Tree root;
     private Commit parent;
-    private String author;
     private long timeStamp;
     private String message;
 
     public Commit(Tree root, Commit parent, String message) {
         this.root = root;
         this.parent = parent;
-        this.author = "Chetan";
         this.timeStamp = new Date().getTime();
         this.message = message;
     }
