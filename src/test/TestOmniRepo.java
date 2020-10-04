@@ -25,7 +25,7 @@ public class TestOmniRepo {
     public TemporaryFolder mockDir = new TemporaryFolder();
 
     @Before
-    public void setUp() throws FileNotFoundException {
+    public void setUp() throws IOException {
         mockDirPath = mockDir.getRoot().getAbsolutePath();
         mockOmniRepo = new OmniRepo(mockDirPath);
         mockObjectsDir = new File(mockDirPath, ".omni/objects");
@@ -38,20 +38,6 @@ public class TestOmniRepo {
         mockObjectsDir = null;
     }
 
-    // Miscellaneous____________________________________________________________________________________________________
-
-    @Test
-    public void saveStateShouldCreateIndex() throws IOException {
-        mockOmniRepo.init();
-        mockOmniRepo.saveState();
-        assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/index")));
-    }
-
-    @Test
-    public void saveStageShouldOverwriteExistingIndex() throws IOException {
-        assertTrue(false);
-    }
-
     // OmniRepo.init____________________________________________________________________________________________________
 
     @Test
@@ -61,7 +47,6 @@ public class TestOmniRepo {
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/branches/")));
         assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/refs/heads")));
         assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/HEAD")));
-        assertTrue(Files.exists(Paths.get(mockDirPath,"/.omni/index")));
     }
 
     @Test
@@ -204,7 +189,7 @@ public class TestOmniRepo {
     }
 
     @Test (expected = Exception.class)
-    public void commitOfUnitializedDirectoryShouldFail() throws FileNotFoundException {
+    public void commitOfUninitializedDirectoryShouldFail() throws FileNotFoundException {
         mockOmniRepo.commit("Commit message.");
     }
 

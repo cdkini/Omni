@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OmniRepo {
@@ -19,7 +20,7 @@ public class OmniRepo {
     private final File mainDir;
     private final File objectsDir;
 
-    public OmniRepo(String path) throws FileNotFoundException {
+    public OmniRepo(String path) throws IOException {
         this.path = path;
         this.stage = new Stage(path);
         this.mainDir = new File(path, "/.omni");
@@ -52,15 +53,13 @@ public class OmniRepo {
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
-        Files.createFile(Paths.get(path, "/.omni/index"));
-
         System.out.println("Initialized empty Omni repository in "+System.getProperty("user.dir")+path);
     }
 
     /**
      * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted hash.
      *
-     * @param fileName is the name of the file that's added to the staging area and serialized into a file.
+     * @param fileName is the name of the file that's added ArrayListto the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
      */
     public void add(String fileName) throws FileNotFoundException {
@@ -95,7 +94,7 @@ public class OmniRepo {
         }
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
-        Tree root = new Tree(new File(pwdPath), stage.getObjects());
+        Tree root = new Tree(new File(pwdPath), stage.getContents());
         Commit commit = new Commit(root, stage.getHead(), message);
 
         root.serialize(objectsDir, root.getSHA1());
@@ -164,30 +163,30 @@ public class OmniRepo {
         private Commit branch;
         private Map<String, OmniObject> contents;
 
-        public Stage(String path) {
+        private Stage(String path) throws IOException {
             this.path = path;
-            this.head = null;
-            this.branch = null;
             this.contents = new HashMap<>();
-            File index = new File(path, ".omni/index");
-//        Scanner scanner = new Scanner(index);
-            // TODO: Fix reading and creation of attribute objects
-//        while (scanner.hasNextLine()) {
-//            String line = scanner.nextLine();
-//            if (line.startsWith("head") {
-//                this.head = line.split(": ")[1];
-//            } else if (line.startsWith("branch") {
-//                this.currBranch = line.split(": ");
-//            } else {
-//
-//            }
-//        }
+            if (Files.exists(Paths.get(path, ".omni/index"))) {
+                JSONObject indexContents = readIndexToJSON();
+                if (indexContents.get("head") != JSONObject.NULL) {
+                    this.head = (Commit) OmniObject.deserialize(new File(path), indexContents.getString("head"));
+                }
+                if (indexContents.get("branch") != JSONObject.NULL) {
+                    this.branch = (Commit) OmniObject.deserialize(new File(path), indexContents.getString("branch"));
+                }
+//                this.contents = Utils.toMap(indexContents.getJSONObject("contents"));
+            }
+        }
+
+        private JSONObject readIndexToJSON() throws IOException {
+            String content = new String(Files.readAllBytes(Paths.get(path, ".omni/index")));
+            return new JSONObject(content);
         }
 
         private void writeContentsToIndex() throws IOException {
             JSONObject obj = new JSONObject();
-            obj.put("head", head);
-            obj.put("branch", branch);
+            obj.put("head", head == null ? JSONObject.NULL : head);
+            obj.put("branch", branch == null ? JSONObject.NULL : branch);
             obj.put("contents", contents);
 
             File index = new File(path,".omni/index");
@@ -201,10 +200,6 @@ public class OmniRepo {
             contents.put(fileName, obj);
         }
 
-        private ArrayList<OmniObject> getObjects() {
-            return new ArrayList<>(contents.values());
-        }
-
         private Commit getHead() {
             return head;
         }
@@ -215,6 +210,10 @@ public class OmniRepo {
 
         private boolean isEmpty() {
             return contents.isEmpty();
+        }
+
+        public List getContents() {
+            return new ArrayList<>(contents.values());
         }
     }
 }
