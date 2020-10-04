@@ -10,11 +10,19 @@ public class Blob extends OmniObject implements Serializable {
     private File file;
     private byte[] contents;
 
+    /**
+     * TODO: Write docstring!
+     * @param file
+     */
     public Blob(File file) {
         this.file = file;
         this.contents = Utils.readContents(file);
     }
 
+    /**
+     * TODO: Write docstring!
+     * @return
+     */
     @Override
     public String getSHA1() {
         return "B"+Utils.sha1(Utils.readContents(file));

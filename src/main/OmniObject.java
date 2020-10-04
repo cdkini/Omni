@@ -1,7 +1,5 @@
 package src.main;
 
-import jdk.jshell.spi.ExecutionControl;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -67,7 +65,13 @@ public abstract class OmniObject implements Serializable {
         return getSHA1();
     }
 
-    public abstract String getPath();
-    public abstract String getName();
+    /**
+     * TODO: Write docstring!
+     * @return
+     */
     public abstract String getSHA1();
+
+    public abstract String getPath();
+
+    public abstract String getName();
 }

@@ -14,6 +14,12 @@ public class Commit extends OmniObject implements Serializable {
     private long timeStamp;
     private String message;
 
+    /**
+     * TODO: Write docstring!
+     * @param root
+     * @param parent
+     * @param message
+     */
     public Commit(Tree root, Commit parent, String message) {
         this.root = root;
         this.parent = parent;
@@ -21,6 +27,10 @@ public class Commit extends OmniObject implements Serializable {
         this.message = message;
     }
 
+    /**
+     * TODO: Write docstring!
+     * @return
+     */
     @Override
     public String getSHA1()  {
         return "C"+Utils.sha1(root.getSHA1());

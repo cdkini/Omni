@@ -2,7 +2,6 @@ package src.main;
 
 import java.io.File;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +14,10 @@ public class Tree extends OmniObject implements Serializable {
     private File dir;
     private List<OmniObject> children;
 
+    /**
+     * TODO: Write docstring!
+     * @param dir
+     */
     public Tree(File dir) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File argument must be a directory");
@@ -30,6 +33,11 @@ public class Tree extends OmniObject implements Serializable {
         }
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param dir
+     * @param objs
+     */
     public Tree(File dir, List objs) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File argument must be a directory");
@@ -42,6 +50,10 @@ public class Tree extends OmniObject implements Serializable {
         return children;
     }
 
+    /**
+     * TODO: Write docstring!
+     * @return
+     */
     @Override
     public String getSHA1() {
         StringBuilder sha1 = new StringBuilder();

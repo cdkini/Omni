@@ -1,9 +1,16 @@
 package src.main;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * TODO: Write docstring!
+ */
 public class Main {
+    /**
+     * TODO: Write docstring!
+     * @param args
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             throw new IllegalArgumentException("No valid command passed.");

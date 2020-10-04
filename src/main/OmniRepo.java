@@ -14,12 +14,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TODO: Write docstring!
+ */
 public class OmniRepo {
     private String path;
     private Stage stage;
     private final File mainDir;
     private final File objectsDir;
 
+    /**
+     * TODO: Write docstring!
+     * @param path
+     * @throws IOException
+     */
     public OmniRepo(String path) throws IOException {
         this.path = path;
         this.stage = new Stage(path);
@@ -27,6 +35,10 @@ public class OmniRepo {
         this.objectsDir = new File(path, "/.omni/objects");
     }
 
+    /**
+     * TODO: Write docstring!
+     * @throws IOException
+     */
     public void saveState() throws IOException {
         stage.writeContentsToIndex();
     }
@@ -85,6 +97,11 @@ public class OmniRepo {
         }
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param message
+     * @throws FileNotFoundException
+     */
     public void commit(String message) throws FileNotFoundException {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
@@ -102,50 +119,96 @@ public class OmniRepo {
         stage.setHead(commit);
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param filename
+     */
     public void rm(String filename) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     */
     public void log() {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     */
     public void globalLog() {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param msg
+     */
     public void find(String msg) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     */
     public void status() {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param fileName
+     */
     public void checkOutFile(String fileName) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param commmitID
+     * @param filename
+     */
     public void checkOutCommit(String commmitID, String filename) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param branchName
+     */
     public void checkOutBranch(String branchName) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param branchName
+     */
     public void branch(String branchName) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param branchName
+     */
     public void rmBranch(String branchName) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param commitID
+     */
     public void reset(String commitID) {
         // TODO: FILL IN
     }
 
+    /**
+     * TODO: Write docstring!
+     * @param branchName
+     */
     public void merge(String branchName) {
         // TODO: FILL IN
     }
@@ -154,6 +217,9 @@ public class OmniRepo {
         return Files.isDirectory(Paths.get(path, "/.omni/"));
     }
 
+    /**
+     * TODO: Write docstring!
+     */
     private class Stage {
         private String path;
         private Commit head;
@@ -209,7 +275,7 @@ public class OmniRepo {
             return contents.isEmpty();
         }
 
-        public List getContents() {
+        private List getContents() {
             return new ArrayList<>(contents.values());
         }
     }
