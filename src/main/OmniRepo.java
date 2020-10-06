@@ -1,18 +1,19 @@
 package src.main;
 
-import org.json.JSONObject;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * TODO: Write docstring!
@@ -30,9 +31,17 @@ public class OmniRepo {
      */
     public OmniRepo(String path) throws IOException {
         this.path = path;
-        this.stage = new Stage(path);
+        if (Files.exists(Paths.get(path, ".omni/index"))) {
+            this.stage = Stage.deserialize(path);
+        } else {
+            this.stage = new Stage(path);
+        }
         this.mainDir = new File(path, "/.omni");
         this.objectsDir = new File(path, "/.omni/objects");
+    }
+
+    public List<OmniObject> getStagedFiles() {
+        return stage.getContents();
     }
 
     /**
@@ -40,7 +49,7 @@ public class OmniRepo {
      * @throws IOException
      */
     public void saveState() throws IOException {
-        stage.writeContentsToIndex();
+        stage.serialize();
     }
 
     /**
@@ -66,6 +75,7 @@ public class OmniRepo {
         fw.close();
 
         System.out.println("Initialized empty Omni repository in "+System.getProperty("user.dir")+path);
+        saveState();
     }
 
     /**
@@ -74,7 +84,7 @@ public class OmniRepo {
      * @param fileName is the name of the file that's added ArrayListto the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
      */
-    public void add(String fileName) throws FileNotFoundException {
+    public void add(String fileName) throws IOException {
         File file = new File(path, fileName);
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
@@ -89,12 +99,13 @@ public class OmniRepo {
                 add(tree.getName()+"/"+child.getName());
             }
             tree.serialize(objectsDir, tree.getSHA1());
-            stage.add(tree.getPath(), tree);
+            stage.add(tree);
         } else {
             Blob blob = new Blob(file);
             blob.serialize(objectsDir, blob.getSHA1());
-            stage.add(blob.getPath(), blob);
+            stage.add(blob);
         }
+        saveState();
     }
 
     /**
@@ -102,7 +113,7 @@ public class OmniRepo {
      * @param message
      * @throws FileNotFoundException
      */
-    public void commit(String message) throws FileNotFoundException {
+    public void commit(String message) throws IOException {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
@@ -117,6 +128,8 @@ public class OmniRepo {
         root.serialize(objectsDir, root.getSHA1());
         commit.serialize(objectsDir, commit.getSHA1());
         stage.setHead(commit);
+        stage.clear();
+        saveState();
     }
 
     /**
@@ -220,47 +233,45 @@ public class OmniRepo {
     /**
      * TODO: Write docstring!
      */
-    private class Stage {
+    private static class Stage implements Serializable {
         private String path;
         private Commit head;
         private Commit branch;
-        private Map<String, OmniObject> contents;
+        private List<OmniObject> contents;
 
         private Stage(String path) throws IOException {
             this.path = path;
-            this.contents = new HashMap<>();
-            if (Files.exists(Paths.get(path, ".omni/index"))) {
-                JSONObject indexContents = readIndexToJSON();
-                if (indexContents.get("head") != JSONObject.NULL) {
-                    this.head = (Commit) OmniObject.deserialize(new File(path), indexContents.getString("head"));
-                }
-                if (indexContents.get("branch") != JSONObject.NULL) {
-                    this.branch = (Commit) OmniObject.deserialize(new File(path), indexContents.getString("branch"));
-                }
-//                this.contents = Utils.toMap(indexContents.getJSONObject("contents"));
+            this.head = null;
+            this.branch = null;
+            this.contents = new ArrayList<>();
+        }
+
+        private void serialize() {
+            File outFile = new File(path, "/.omni/index");
+            try {
+                ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outFile));
+                oos.writeObject(this);
+                oos.close();
+            } catch (IOException e) {
+                throw new Error("Error when output serialized file.");
             }
         }
 
-        private JSONObject readIndexToJSON() throws IOException {
-            String content = new String(Files.readAllBytes(Paths.get(path, ".omni/index")));
-            return new JSONObject(content);
+        private static Stage deserialize(String path) {
+            Stage stage;
+            File inFile = new File(path, "/.omni/index");
+            try {
+                ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inFile));
+                stage = (Stage) ois.readObject();
+                ois.close();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new Error("IO Error or Class Not Find");
+            }
+            return stage;
         }
 
-        private void writeContentsToIndex() throws IOException {
-            JSONObject obj = new JSONObject();
-            obj.put("head", head == null ? JSONObject.NULL : head);
-            obj.put("branch", branch == null ? JSONObject.NULL : branch);
-            obj.put("contents", contents);
-
-            File index = new File(path,".omni/index");
-            FileWriter fw = new FileWriter(index);
-            fw.write(obj.toString());
-            fw.flush();
-            fw.close();
-        }
-
-        private void add(String fileName, OmniObject obj) {
-            contents.put(fileName, obj);
+        private void add(OmniObject obj) {
+            contents.add(obj);
         }
 
         private Commit getHead() {
@@ -275,8 +286,12 @@ public class OmniRepo {
             return contents.isEmpty();
         }
 
-        private List getContents() {
-            return new ArrayList<>(contents.values());
+        private List<OmniObject> getContents() {
+            return contents;
+        }
+
+        private void clear() {
+            contents.clear();
         }
     }
 }

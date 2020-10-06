@@ -8,7 +8,10 @@ import org.junit.rules.TemporaryFolder;
 import src.main.OmniRepo;
 import src.main.Utils;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,6 +39,10 @@ public class TestOmniRepo {
         mockDirPath = "";
         mockOmniRepo = null;
         mockObjectsDir = null;
+    }
+
+    private void resetOmniRepo() throws IOException {
+        mockOmniRepo = new OmniRepo(mockDirPath);
     }
 
     // OmniRepo.init____________________________________________________________________________________________________
@@ -68,6 +75,7 @@ public class TestOmniRepo {
     public void addShouldSerializeBlobInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
+        resetOmniRepo();
         mockOmniRepo.add("foo.txt");
         assertEquals(1, mockObjectsDir.list().length);
     }
@@ -78,6 +86,7 @@ public class TestOmniRepo {
         String[] fileNames = {"foo.txt", "bar.txt"};
         for (int i = 0; i < fileNames.length; i++) {
             File mockFile = mockDir.newFile(fileNames[i]);
+            resetOmniRepo();
             mockOmniRepo.add(fileNames[i]);
             assertEquals(1, mockObjectsDir.list().length);
         }
@@ -95,6 +104,7 @@ public class TestOmniRepo {
             bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
             bw.write(fileMsgs[i]);
             bw.close();
+            resetOmniRepo();
             mockOmniRepo.add(fileNames[i]);
         }
         assertEquals(2, mockObjectsDir.list().length);
@@ -111,6 +121,7 @@ public class TestOmniRepo {
             bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
             bw.write("This is a random piece of text!");
             bw.close();
+            resetOmniRepo();
             mockOmniRepo.add(fileNames[i]);
             assertEquals(1, mockObjectsDir.list().length);
         }
@@ -131,6 +142,7 @@ public class TestOmniRepo {
             bw.close();
         }
 
+        resetOmniRepo();
         mockOmniRepo.add("Temp");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -153,8 +165,11 @@ public class TestOmniRepo {
             }
         }
 
+        resetOmniRepo();
         mockOmniRepo.add("TempA");
         assertEquals(3, mockObjectsDir.list().length);
+
+        resetOmniRepo();
         mockOmniRepo.add("TempB");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -168,6 +183,7 @@ public class TestOmniRepo {
     @Test (expected = Exception.class)
     public void addNonExistingFileShouldFail() throws IOException {
         mockOmniRepo.init();
+        resetOmniRepo();
         mockOmniRepo.add("foo.txt");
     }
 
@@ -177,7 +193,9 @@ public class TestOmniRepo {
     public void commitOfStagedFileShouldSerializeInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
+        resetOmniRepo();
         mockOmniRepo.add("foo.txt");
+        resetOmniRepo();
         mockOmniRepo.commit("Committed foo!");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -185,12 +203,25 @@ public class TestOmniRepo {
     @Test (expected = Exception.class)
     public void commitOfEmptyStageShouldFail() throws IOException {
         mockOmniRepo.init();
+        resetOmniRepo();
         mockOmniRepo.commit("Commit message.");
     }
 
     @Test (expected = Exception.class)
-    public void commitOfUninitializedDirectoryShouldFail() throws FileNotFoundException {
+    public void commitOfUninitializedDirectoryShouldFail() throws IOException {
         mockOmniRepo.commit("Commit message.");
+    }
+
+    @Test
+    public void commitClearsStagedFiles() throws IOException {
+        mockOmniRepo.init();
+        resetOmniRepo();
+        File mockFile = mockDir.newFile("foo.txt");
+        resetOmniRepo();
+        mockOmniRepo.add("foo.txt");
+        resetOmniRepo();
+        mockOmniRepo.commit("Committed foo!");
+        assertEquals(0, mockOmniRepo.getStagedFiles().size());
     }
 
     // OmniRepo.rm______________________________________________________________________________________________________

@@ -38,7 +38,7 @@ public class Tree extends OmniObject implements Serializable {
      * @param dir
      * @param objs
      */
-    public Tree(File dir, List objs) {
+    public Tree(File dir, List<OmniObject> objs) {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File argument must be a directory");
         }
