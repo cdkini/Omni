@@ -51,6 +51,7 @@ public class Tree extends OmniObject implements Serializable {
     }
 
     /**
+     * FIXME: Update SHA1 for tree (issues created by nested directories)
      * TODO: Write docstring!
      * @return
      */

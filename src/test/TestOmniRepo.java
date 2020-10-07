@@ -41,7 +41,8 @@ public class TestOmniRepo {
         mockObjectsDir = null;
     }
 
-    private void resetOmniRepo() throws IOException {
+    private void saveStateBetweenCommands() throws IOException {
+        mockOmniRepo.saveState();
         mockOmniRepo = new OmniRepo(mockDirPath);
     }
 
@@ -75,7 +76,7 @@ public class TestOmniRepo {
     public void addShouldSerializeBlobInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("foo.txt");
         assertEquals(1, mockObjectsDir.list().length);
     }
@@ -86,7 +87,7 @@ public class TestOmniRepo {
         String[] fileNames = {"foo.txt", "bar.txt"};
         for (int i = 0; i < fileNames.length; i++) {
             File mockFile = mockDir.newFile(fileNames[i]);
-            resetOmniRepo();
+            saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
             assertEquals(1, mockObjectsDir.list().length);
         }
@@ -104,7 +105,7 @@ public class TestOmniRepo {
             bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
             bw.write(fileMsgs[i]);
             bw.close();
-            resetOmniRepo();
+            saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
         }
         assertEquals(2, mockObjectsDir.list().length);
@@ -121,7 +122,7 @@ public class TestOmniRepo {
             bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
             bw.write("This is a random piece of text!");
             bw.close();
-            resetOmniRepo();
+            saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
             assertEquals(1, mockObjectsDir.list().length);
         }
@@ -142,7 +143,7 @@ public class TestOmniRepo {
             bw.close();
         }
 
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("Temp");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -165,11 +166,11 @@ public class TestOmniRepo {
             }
         }
 
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("TempA");
         assertEquals(3, mockObjectsDir.list().length);
 
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("TempB");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -183,7 +184,7 @@ public class TestOmniRepo {
     @Test (expected = Exception.class)
     public void addNonExistingFileShouldFail() throws IOException {
         mockOmniRepo.init();
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("foo.txt");
     }
 
@@ -193,9 +194,9 @@ public class TestOmniRepo {
     public void commitOfStagedFileShouldSerializeInObjectsDir() throws IOException {
         mockOmniRepo.init();
         File mockFile = mockDir.newFile("foo.txt");
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("foo.txt");
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.commit("Committed foo!");
         assertEquals(3, mockObjectsDir.list().length);
     }
@@ -203,7 +204,7 @@ public class TestOmniRepo {
     @Test (expected = Exception.class)
     public void commitOfEmptyStageShouldFail() throws IOException {
         mockOmniRepo.init();
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.commit("Commit message.");
     }
 
@@ -215,11 +216,11 @@ public class TestOmniRepo {
     @Test
     public void commitClearsStagedFiles() throws IOException {
         mockOmniRepo.init();
-        resetOmniRepo();
+        saveStateBetweenCommands();
         File mockFile = mockDir.newFile("foo.txt");
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.add("foo.txt");
-        resetOmniRepo();
+        saveStateBetweenCommands();
         mockOmniRepo.commit("Committed foo!");
         assertEquals(0, mockOmniRepo.getStagedFiles().size());
     }

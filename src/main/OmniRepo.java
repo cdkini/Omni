@@ -75,7 +75,6 @@ public class OmniRepo {
         fw.close();
 
         System.out.println("Initialized empty Omni repository in "+System.getProperty("user.dir")+path);
-        saveState();
     }
 
     /**
@@ -105,7 +104,6 @@ public class OmniRepo {
             blob.serialize(objectsDir, blob.getSHA1());
             stage.add(blob);
         }
-        saveState();
     }
 
     /**
@@ -129,7 +127,6 @@ public class OmniRepo {
         commit.serialize(objectsDir, commit.getSHA1());
         stage.setHead(commit);
         stage.clear();
-        saveState();
     }
 
     /**
