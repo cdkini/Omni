@@ -129,7 +129,7 @@ public class OmniRepo {
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
         Tree root = new Tree(new File(pwdPath), getStagedObjects());
-        Commit commit = new Commit(root, stage.head, message);
+        Commit commit = new Commit(root, stage.head, message, getStagedFiles());
 
         root.serialize(objectsDir, root.getSHA1());
         commit.serialize(objectsDir, commit.getSHA1());

@@ -12,6 +12,7 @@ import src.main.Tree;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,14 +38,14 @@ public class TestCommit {
 
     @Test
     public void serializeCommitShouldCreateHashFile() {
-        Commit mockCommit = new Commit(root, null, "This is a random commit message!");
+        Commit mockCommit = new Commit(root, null, "This is a random commit message!", new ArrayList<>());
         mockCommit.serialize(mockDir.getRoot(), "res");
         assertTrue(Files.exists(Paths.get(mockDirPath, "res")));
     }
 
     @Test
     public void deserializeHashFileShouldCreateCommit() {
-        Commit mockCommit = new Commit(root, null, "This is a random commit message!");
+        Commit mockCommit = new Commit(root, null, "This is a random commit message!", new ArrayList<>());
         mockCommit.serialize(mockDir.getRoot(), "res");
         Commit resCommit = (Commit) OmniObject.deserialize(mockDir.getRoot(), "res");
         assertEquals(mockCommit.getPath(), resCommit.getPath());
@@ -54,7 +55,7 @@ public class TestCommit {
 
     @Test
     public void getSHA1OfCommitShouldStartWithC() {
-        Commit mockCommit = new Commit(root, null, "");
+        Commit mockCommit = new Commit(root, null, "", new ArrayList<>());
         String sha1 = mockCommit.getSHA1();
         assertTrue(sha1.startsWith("C"));
     }

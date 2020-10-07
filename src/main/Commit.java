@@ -2,6 +2,7 @@ package src.main;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /*
  * Commit is Omni's internal representation of a snapshot of a repository and its staged files at a particular point in
@@ -13,6 +14,7 @@ public class Commit extends OmniObject implements Serializable {
     private Commit parent;
     private long timeStamp;
     private String message;
+    private List<String> tracked;
 
     /**
      * TODO: Write docstring!
@@ -20,11 +22,12 @@ public class Commit extends OmniObject implements Serializable {
      * @param parent
      * @param message
      */
-    public Commit(Tree root, Commit parent, String message) {
+    public Commit(Tree root, Commit parent, String message, List<String> tracked) {
         this.root = root;
         this.parent = parent;
         this.timeStamp = new Date().getTime();
         this.message = message;
+        this.tracked = tracked;
     }
 
     /**
