@@ -14,8 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * TODO: Write docstring!
@@ -241,12 +243,14 @@ public class OmniRepo {
         private Commit head;
         private Commit branch;
         private Map<String, OmniObject> contents;
+        private Set<String> removed;
 
         private Stage(String path) {
             this.path = path;
             this.head = null;
             this.branch = null;
             this.contents = new HashMap<>();
+            this.removed = new HashSet<>();
         }
 
         private void serialize() {

@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -243,6 +244,23 @@ public class TestOmniRepo {
     }
 
     // OmniRepo.rm______________________________________________________________________________________________________
+
+    @Test
+    public void rmStagedFileShouldUnstage() {
+        assertTrue(false);
+    }
+
+    @Test (expected = Exception.class)
+    public void rmFileThatDoesNotExistShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.rm("abc");
+    }
+
+    @Test (expected = Exception.class)
+    public void rmInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.rm("abc");
+    }
 
     // OmniRepo.log_____________________________________________________________________________________________________
 
