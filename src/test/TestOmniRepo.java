@@ -82,7 +82,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void addOfTwoBlankBlobsShouldOnlyAddOnce() throws IOException {
+    public void addOfTwoBlankFilesShouldOnlyAddOnceToObjectsDir() throws IOException {
         mockOmniRepo.init();
         String[] fileNames = {"foo.txt", "bar.txt"};
         for (int i = 0; i < fileNames.length; i++) {
@@ -94,7 +94,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void addOfTwoBlobsWithDifferentContentsShouldAddTwice() throws IOException {
+    public void addOfTwoFilesWithDifferentContentsShouldAddToObjectsDirTwice() throws IOException {
         mockOmniRepo.init();
 
         String[] fileNames = {"foo.txt", "bar.txt"};
@@ -112,7 +112,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void addOfTwoBlobsWithIdenticalContentsShouldOnlyAddOnce() throws IOException {
+    public void addOfTwoFilesWithIdenticalContentsShouldOnlyAddToObjectsDirOnce() throws IOException {
         mockOmniRepo.init();
 
         String[] fileNames = {"foo.txt", "bar.txt"};
@@ -149,7 +149,7 @@ public class TestOmniRepo {
     }
 
     @Test
-    public void addOfTreeWithSameContentsShouldOnlyAddOnce() throws IOException {
+    public void addOfDirWithSameContentsShouldOnlyAddToObjectsDirOnce() throws IOException {
         mockOmniRepo.init();
 
         String[] dirNames = {"TempA", "TempB"};
@@ -173,6 +173,23 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
         mockOmniRepo.add("TempB");
         assertEquals(3, mockObjectsDir.list().length);
+    }
+
+    @Test
+    public void addOfSameFileNameButDifferentContentsShouldOverrideInStage() throws IOException {
+        mockOmniRepo.init();
+
+        File mockFile = mockDir.newFile("foo.txt");
+        String[] fileMsgs = {"First line", "Second line", "Third line"};
+        BufferedWriter bw;
+        for (int i = 0; i < fileMsgs.length; i++) {
+            bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
+            bw.write(fileMsgs[i]);
+            bw.close();
+            saveStateBetweenCommands();
+            mockOmniRepo.add(mockFile.getName());
+            assertEquals(1, mockOmniRepo.getStagedFiles().size());
+        }
     }
 
     @Test (expected = Exception.class)
@@ -201,6 +218,18 @@ public class TestOmniRepo {
         assertEquals(3, mockObjectsDir.list().length);
     }
 
+    @Test
+    public void commitClearsStagedFiles() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        File mockFile = mockDir.newFile("foo.txt");
+        saveStateBetweenCommands();
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+        mockOmniRepo.commit("Committed foo!");
+        assertTrue(mockOmniRepo.getStagedFiles().isEmpty());
+    }
+
     @Test (expected = Exception.class)
     public void commitOfEmptyStageShouldFail() throws IOException {
         mockOmniRepo.init();
@@ -211,18 +240,6 @@ public class TestOmniRepo {
     @Test (expected = Exception.class)
     public void commitOfUninitializedDirectoryShouldFail() throws IOException {
         mockOmniRepo.commit("Commit message.");
-    }
-
-    @Test
-    public void commitClearsStagedFiles() throws IOException {
-        mockOmniRepo.init();
-        saveStateBetweenCommands();
-        File mockFile = mockDir.newFile("foo.txt");
-        saveStateBetweenCommands();
-        mockOmniRepo.add("foo.txt");
-        saveStateBetweenCommands();
-        mockOmniRepo.commit("Committed foo!");
-        assertEquals(0, mockOmniRepo.getStagedFiles().size());
     }
 
     // OmniRepo.rm______________________________________________________________________________________________________

@@ -13,7 +13,9 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: Write docstring!
@@ -40,8 +42,12 @@ public class OmniRepo {
         this.objectsDir = new File(path, "/.omni/objects");
     }
 
-    public List<OmniObject> getStagedFiles() {
-        return stage.getContents();
+    public List<String> getStagedFiles() {
+        return new ArrayList<>(stage.contents.keySet());
+    }
+
+    public List<OmniObject> getStagedObjects() {
+        return new ArrayList<>(stage.contents.values());
     }
 
     /**
@@ -79,7 +85,7 @@ public class OmniRepo {
 
     /**
      * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted hash.
-     *
+     *file.getAbsolutePath()
      * @param fileName is the name of the file that's added ArrayListto the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
      */
@@ -98,11 +104,11 @@ public class OmniRepo {
                 add(tree.getName()+"/"+child.getName());
             }
             tree.serialize(objectsDir, tree.getSHA1());
-            stage.add(tree);
+            stage.contents.put(tree.getPath(), tree);
         } else {
             Blob blob = new Blob(file);
             blob.serialize(objectsDir, blob.getSHA1());
-            stage.add(blob);
+            stage.contents.put(blob.getPath(), blob);
         }
     }
 
@@ -115,18 +121,18 @@ public class OmniRepo {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
-        if (stage.isEmpty()) {
+        if (stage.contents.isEmpty()) {
             throw new IllegalStateException("No changes added to commit (use 'omni add')");
         }
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
-        Tree root = new Tree(new File(pwdPath), stage.getContents());
-        Commit commit = new Commit(root, stage.getHead(), message);
+        Tree root = new Tree(new File(pwdPath), getStagedObjects());
+        Commit commit = new Commit(root, stage.head, message);
 
         root.serialize(objectsDir, root.getSHA1());
         commit.serialize(objectsDir, commit.getSHA1());
-        stage.setHead(commit);
-        stage.clear();
+        stage.head = commit;
+        stage.contents.clear();
     }
 
     /**
@@ -234,13 +240,13 @@ public class OmniRepo {
         private String path;
         private Commit head;
         private Commit branch;
-        private List<OmniObject> contents;
+        private Map<String, OmniObject> contents;
 
-        private Stage(String path) throws IOException {
+        private Stage(String path) {
             this.path = path;
             this.head = null;
             this.branch = null;
-            this.contents = new ArrayList<>();
+            this.contents = new HashMap<>();
         }
 
         private void serialize() {
@@ -265,30 +271,6 @@ public class OmniRepo {
                 throw new Error("IO Error or Class Not Find");
             }
             return stage;
-        }
-
-        private void add(OmniObject obj) {
-            contents.add(obj);
-        }
-
-        private Commit getHead() {
-            return head;
-        }
-
-        private void setHead(Commit head) {
-            this.head = head;
-        }
-
-        private boolean isEmpty() {
-            return contents.isEmpty();
-        }
-
-        private List<OmniObject> getContents() {
-            return contents;
-        }
-
-        private void clear() {
-            contents.clear();
         }
     }
 }
