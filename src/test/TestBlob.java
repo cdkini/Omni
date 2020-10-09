@@ -9,6 +9,7 @@ import src.main.Blob;
 import src.main.OmniObject;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -39,18 +40,18 @@ public class TestBlob {
     }
 
     @Test (expected = Exception.class)
-    public void instantiationOfBlobWithInvalidFileShouldFail() {
+    public void instantiationOfBlobWithInvalidFileShouldFail() throws FileNotFoundException {
         Blob invalidBlob = new Blob(new File("abc"));
     }
 
     @Test
-    public void serializeBlobShouldCreateHashFile() {
+    public void serializeBlobShouldCreateHashFile() throws FileNotFoundException {
         mockBlob.serialize(mockDir.getRoot(), "res");
         assertTrue(Files.exists(Paths.get(mockDirPath, "res")));
     }
 
     @Test
-    public void deserializeHashFileShouldCreateBlob() {
+    public void deserializeHashFileShouldCreateBlob() throws FileNotFoundException {
         mockBlob.serialize(mockDir.getRoot(), "res");
         Blob resBlob = (Blob) OmniObject.deserialize(mockDir.getRoot(), "res");
         assertEquals(mockBlob.getPath(), resBlob.getPath());

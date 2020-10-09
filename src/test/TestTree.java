@@ -10,6 +10,7 @@ import src.main.OmniObject;
 import src.main.Tree;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -50,7 +51,7 @@ public class TestTree {
     }
 
     @Test (expected = Exception.class)
-    public void instantiationOfTreeWithNonexistentDirectoryShouldFail() {
+    public void instantiationOfTreeWithNonexistentDirectoryShouldFail() throws FileNotFoundException {
         Tree invalidTree = new Tree(new File("temp"));
     }
 
@@ -81,7 +82,7 @@ public class TestTree {
     }
 
     @Test
-    public void serializeTreeShouldCreateHashFile() {
+    public void serializeTreeShouldCreateHashFile() throws FileNotFoundException {
         Tree mockTree = new Tree(mockNestedDir);
         mockTree.serialize(mockDir.getRoot(), "res");
         assertTrue(Files.exists(Paths.get(mockDirPath, "res")));
@@ -100,7 +101,7 @@ public class TestTree {
     }
 
     @Test
-    public void getSHA1OfTreeShouldStartWithT() {
+    public void getSHA1OfTreeShouldStartWithT() throws FileNotFoundException {
         Tree mockTree = new Tree(mockNestedDir);
         String sha1 = mockTree.getSHA1();
         assertTrue(sha1.startsWith("T"));

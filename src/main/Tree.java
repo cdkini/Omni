@@ -1,6 +1,7 @@
 package src.main;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class Tree extends OmniObject implements Serializable {
      * TODO: Write docstring!
      * @param dir
      */
-    public Tree(File dir) {
+    public Tree(File dir) throws FileNotFoundException {
         if (!dir.isDirectory()) {
             throw new IllegalArgumentException("File argument must be a directory");
         }

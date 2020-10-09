@@ -9,6 +9,7 @@ import src.main.Commit;
 import src.main.OmniObject;
 import src.main.Tree;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,14 +38,14 @@ public class TestCommit {
     }
 
     @Test
-    public void serializeCommitShouldCreateHashFile() {
+    public void serializeCommitShouldCreateHashFile() throws FileNotFoundException {
         Commit mockCommit = new Commit(root, null, "This is a random commit message!", new ArrayList<>());
         mockCommit.serialize(mockDir.getRoot(), "res");
         assertTrue(Files.exists(Paths.get(mockDirPath, "res")));
     }
 
     @Test
-    public void deserializeHashFileShouldCreateCommit() {
+    public void deserializeHashFileShouldCreateCommit() throws FileNotFoundException {
         Commit mockCommit = new Commit(root, null, "This is a random commit message!", new ArrayList<>());
         mockCommit.serialize(mockDir.getRoot(), "res");
         Commit resCommit = (Commit) OmniObject.deserialize(mockDir.getRoot(), "res");

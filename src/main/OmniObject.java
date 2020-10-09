@@ -2,6 +2,7 @@ package src.main;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +20,7 @@ public abstract class OmniObject implements Serializable {
      * @param parent is the directory that your file is located in.
      * @param fileName is the name of the file you wish to deserialize.
      */
-    public void serialize(File parent, String fileName) {
+    public void serialize(File parent, String fileName) throws FileNotFoundException {
         File outFile = new File(parent, fileName);
         if (outFile.isDirectory()) {
             for (File file: outFile.listFiles()) {

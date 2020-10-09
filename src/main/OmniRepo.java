@@ -14,10 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * TODO: Write docstring!
@@ -30,6 +28,7 @@ public class OmniRepo {
 
     /**
      * TODO: Write docstring!
+     *
      * @param path
      * @throws IOException
      */
@@ -44,6 +43,14 @@ public class OmniRepo {
         this.objectsDir = new File(path, "/.omni/objects");
     }
 
+    public Commit getHead() {
+        return stage.head;
+    }
+
+    public List<String> getTrackedFiles() {
+        return stage.head.getTracked();
+    }
+
     public List<String> getStagedFiles() {
         return new ArrayList<>(stage.contents.keySet());
     }
@@ -54,9 +61,9 @@ public class OmniRepo {
 
     /**
      * TODO: Write docstring!
-     * @throws IOException
+     *
      */
-    public void saveState() throws IOException {
+    public void saveState() {
         stage.serialize();
     }
 
@@ -68,7 +75,7 @@ public class OmniRepo {
      */
     public void init() throws IOException {
         if (Files.isDirectory(Paths.get(path, "/.omni/"))) {
-            throw new FileAlreadyExistsException("Omni directory already initialized in "+
+            throw new FileAlreadyExistsException("Omni directory already initialized in " +
                     Paths.get(".").toAbsolutePath().normalize().toString());
         }
 
@@ -78,16 +85,18 @@ public class OmniRepo {
         Files.createDirectory(Paths.get(path, "/.omni/refs/"));
         Files.createDirectory(Paths.get(path, "/.omni/refs/heads"));
 
-        FileWriter fw = new FileWriter(path+"/.omni/HEAD");
+        FileWriter fw = new FileWriter(path + "/.omni/HEAD");
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
-        System.out.println("Initialized empty Omni repository in "+System.getProperty("user.dir")+path);
+        commit(null, "Initial commit", null);
+        System.out.println("Initialized empty Omni repository in " + System.getProperty("user.dir") + path);
     }
 
     /**
      * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted hash.
-     *file.getAbsolutePath()
+     * file.getAbsolutePath()
+     *
      * @param fileName is the name of the file that's added ArrayListto the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
      */
@@ -102,8 +111,8 @@ public class OmniRepo {
 
         if (file.isDirectory()) {
             Tree tree = new Tree(file);
-            for (OmniObject child: tree.getChildren()) {
-                add(tree.getName()+"/"+child.getName());
+            for (OmniObject child : tree.getChildren()) {
+                add(tree.getName() + "/" + child.getName());
             }
             tree.serialize(objectsDir, tree.getSHA1());
             stage.contents.put(tree.getPath(), tree);
@@ -126,10 +135,15 @@ public class OmniRepo {
         if (stage.contents.isEmpty()) {
             throw new IllegalStateException("No changes added to commit (use 'omni add')");
         }
+        commit(stage.head, message, getStagedFiles());
+    }
+
+    private void commit(Commit parent, String message, List<String> tracked) throws FileNotFoundException {
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
+
         Tree root = new Tree(new File(pwdPath), getStagedObjects());
-        Commit commit = new Commit(root, stage.head, message, getStagedFiles());
+        Commit commit = new Commit(root, parent, message, tracked);
 
         root.serialize(objectsDir, root.getSHA1());
         commit.serialize(objectsDir, commit.getSHA1());
@@ -139,10 +153,41 @@ public class OmniRepo {
 
     /**
      * TODO: Write docstring!
-     * @param filename
+     *
+     * @param fileName
      */
-    public void rm(String filename) {
-        // TODO: FILL IN
+    public void rm(String fileName) throws FileNotFoundException {
+        File file = new File(path, fileName);
+        String filePath = file.getAbsolutePath();
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        if (!file.exists()) {
+            throw new FileNotFoundException(file.getName() + " did not match any files in current repository");
+        }
+
+        List<String> stagedFiles = getStagedFiles();
+        List<String> tracked = stage.head.getTracked();
+        if (stagedFiles != null && stagedFiles.contains(filePath)) {
+            stage.contents.remove(filePath);
+            System.out.println("Unstaged "+filePath);
+        } else if (tracked != null && tracked.contains(filePath)) {
+            stage.head.removeFromTracked(filePath);
+            deleteFile(new File(filePath));
+            System.out.println("Rm "+filePath);
+        } else {
+            throw new IllegalStateException("Cannot rm unstaged and untracked file");
+        }
+    }
+
+    private boolean deleteFile(File file) {
+        if (file.isDirectory()) {
+            String[] children = file.list();
+            for (int i = 0; i < children.length; i++) {
+                return deleteFile(new File(file, children[i]));
+            }
+        }
+        return file.delete();
     }
 
     /**
@@ -243,14 +288,12 @@ public class OmniRepo {
         private Commit head;
         private Commit branch;
         private Map<String, OmniObject> contents;
-        private Set<String> removed;
 
         private Stage(String path) {
             this.path = path;
             this.head = null;
             this.branch = null;
             this.contents = new HashMap<>();
-            this.removed = new HashSet<>();
         }
 
         private void serialize() {

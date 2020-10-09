@@ -21,6 +21,7 @@ public class Commit extends OmniObject implements Serializable {
      * @param root
      * @param parent
      * @param message
+     * @param tracked
      */
     public Commit(Tree root, Commit parent, String message, List<String> tracked) {
         this.root = root;
@@ -28,6 +29,18 @@ public class Commit extends OmniObject implements Serializable {
         this.timeStamp = new Date().getTime();
         this.message = message;
         this.tracked = tracked;
+    }
+
+    /**
+     * TODO: Add docstring!
+     * @param filePath
+     */
+    public void removeFromTracked(String filePath) {
+        tracked.remove(filePath);
+    }
+
+    public List<String> getTracked() {
+        return tracked;
     }
 
     /**
