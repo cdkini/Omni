@@ -360,6 +360,77 @@ public class TestOmniRepo {
 
     // OmniRepo.find____________________________________________________________________________________________________
 
+    @Test
+    public void findInInitializedRepoShouldFindOneCommit() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        int count = mockOmniRepo.find("Initial commit");
+        assertEquals(1, count);
+    }
+
+    @Test
+    public void findDuplicatedMessageOfDifferentCommitsShouldFindMultipleCommits() throws IOException {
+        mockOmniRepo.init();
+
+        String[] fileNames = {"a.txt", "b.txt", "c.txt", "d.txt", "e.txt"};
+        String[] fileMsgs = {"a", "b", "c", "d", "e"};
+        BufferedWriter bw;
+        for (int i = 0; i < fileNames.length; i++) {
+            File mockFile = mockDir.newFile(fileNames[i]);
+            bw = new BufferedWriter(new FileWriter(mockFile.getPath(), true));
+            bw.write(fileMsgs[i]);
+            bw.close();
+
+            saveStateBetweenCommands();
+            mockOmniRepo.add(fileNames[i]);
+
+            saveStateBetweenCommands();
+            mockOmniRepo.commit("Committing a file!");
+
+            saveStateBetweenCommands();
+            assertEquals(i+1, mockOmniRepo.find("Committing a file!"));
+        }
+    }
+
+    @Test
+    public void findDuplicatedMessageOfIdenticalCommitsShouldFindSameCommit() throws IOException {
+        mockOmniRepo.init();
+
+        String[] fileNames = {"a.txt", "b.txt", "c.txt", "d.txt", "e.txt"};
+        for (int i = 0; i < fileNames.length; i++) {
+            saveStateBetweenCommands();
+            File mockFile = mockDir.newFile(fileNames[i]);
+
+            mockOmniRepo.add(fileNames[i]);
+            saveStateBetweenCommands();
+
+            mockOmniRepo.commit("Committing a file!");
+            saveStateBetweenCommands();
+
+            assertEquals(1, mockOmniRepo.find("Committing a file!"));
+        }
+    }
+
+    @Test (expected = Exception.class)
+    public void findNonexistentMessageShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        File mockFile1 = mockDir.newFile("foo.txt");
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Committing foo.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.find("Committing bar.txt");
+    }
+
+    @Test (expected = Exception.class)
+    public void findInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.globalLog();
+    }
+
     // OmniRepo.status__________________________________________________________________________________________________
 
     // OmniRepo.checkout________________________________________________________________________________________________

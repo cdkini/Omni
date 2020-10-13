@@ -231,8 +231,24 @@ public class OmniRepo {
      * TODO: Write docstring!
      * @param msg
      */
-    public void find(String msg) {
-        // TODO: FILL IN
+    public int find(String msg) throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        int count = 0;
+        for (File file: objectsDir.listFiles()) {
+            if (file.getName().startsWith("C")) {
+                Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
+                if (curr.getMessage().equals(msg)) {
+                    System.out.println(curr.getSHA1());
+                    count++;
+                }
+            }
+        }
+        if (count == 0) {
+            throw new IllegalArgumentException("Found no commit with that message");
+        }
+        return count;
     }
 
     /**
