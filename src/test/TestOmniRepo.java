@@ -346,7 +346,17 @@ public class TestOmniRepo {
 
     // OmniRepo.log_____________________________________________________________________________________________________
 
+    @Test (expected = Exception.class)
+    public void logInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.log();
+    }
+
     // OmniRepo.globalLog_______________________________________________________________________________________________
+
+    @Test (expected = Exception.class)
+    public void globalLogInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.globalLog();
+    }
 
     // OmniRepo.find____________________________________________________________________________________________________
 

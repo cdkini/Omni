@@ -193,15 +193,38 @@ public class OmniRepo {
     /**
      * TODO: Write docstring!
      */
-    public void log() {
-        // TODO: FILL IN
+    public void log() throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        Commit curr = stage.head;
+        while (curr != null) {
+            logCommitContents(curr);
+            curr = curr.getParent();
+        }
     }
 
     /**
      * TODO: Write docstring!
      */
-    public void globalLog() {
-        // TODO: FILL IN
+    public void globalLog() throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        for (File file: objectsDir.listFiles()) {
+            if (file.getName().startsWith("C")) {
+                Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
+                logCommitContents(curr);
+            }
+        }
+    }
+
+    private void logCommitContents(Commit commit) {
+        System.out.println("===");
+        System.out.println("commit "+commit.getSHA1());
+        System.out.println("Date: "+commit.getDateTime());
+        System.out.println(commit.getMessage());
+        System.out.println();
     }
 
     /**

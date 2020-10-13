@@ -39,6 +39,18 @@ public class Commit extends OmniObject implements Serializable {
         tracked.remove(filePath);
     }
 
+    public Commit getParent() {
+        return parent;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public Date getDateTime() {
+        return new Date(timeStamp);
+    }
+
     public List<String> getTracked() {
         return tracked;
     }
