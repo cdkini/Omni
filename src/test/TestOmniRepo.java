@@ -433,6 +433,22 @@ public class TestOmniRepo {
 
     // OmniRepo.status__________________________________________________________________________________________________
 
+    @Test
+    public void temp() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        File mockFile1 = mockDir.newFile("foo.txt");
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+        mockOmniRepo.status();
+        assertTrue(false); // TODO: Delete this test!
+    }
+
+    @Test (expected = Exception.class)
+    public void statusInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.status();
+    }
+
     // OmniRepo.checkout________________________________________________________________________________________________
 
     // OmniRepo.branch__________________________________________________________________________________________________

@@ -254,8 +254,43 @@ public class OmniRepo {
     /**
      * TODO: Write docstring!
      */
-    public void status() {
-        // TODO: FILL IN
+    public void status() throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        printBranches();
+        printStagedFiles();
+        printRemovedFiles();
+        printUnstagedModifications();
+        printUntrackedFiles();
+    }
+
+    private void printBranches() {
+        System.out.println("=== Branches ===");
+        System.out.println();
+    }
+
+    private void printStagedFiles() {
+        System.out.println("=== Staged Files ===");
+        for (String fileName: stage.contents.keySet()) {
+            System.out.println(fileName);
+        }
+        System.out.println();
+    }
+
+    private void printRemovedFiles() {
+        System.out.println("=== Removed Files ===");
+        System.out.println("");
+    }
+
+    private void printUnstagedModifications() {
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        System.out.println("");
+    }
+
+    private void printUntrackedFiles() {
+        System.out.println("=== Untracked Files ===");
+        System.out.println("");
     }
 
     /**
