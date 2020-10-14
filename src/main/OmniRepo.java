@@ -23,8 +23,6 @@ import java.util.Map;
 public class OmniRepo {
     private String path;
     private Stage stage;
-    private final File mainDir;
-    private final File objectsDir;
 
     /**
      * TODO: Write docstring!
@@ -39,8 +37,6 @@ public class OmniRepo {
         } else {
             this.stage = new Stage(path);
         }
-        this.mainDir = new File(path, "/.omni");
-        this.objectsDir = new File(path, "/.omni/objects");
     }
 
     public Commit getHead() {
@@ -89,7 +85,12 @@ public class OmniRepo {
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
-        commit(null, "Initial commit", null);
+        Commit head = commit(null, "Initial commit", null);
+        stage.head = head;
+
+        Branch master = new Branch("master", head);
+        stage.branch = master;
+
         System.out.println("Initialized empty Omni repository in " + System.getProperty("user.dir") + path);
     }
 
@@ -114,11 +115,11 @@ public class OmniRepo {
             for (OmniObject child : tree.getChildren()) {
                 add(tree.getName() + "/" + child.getName());
             }
-            tree.serialize(objectsDir, tree.getSHA1());
+            tree.serialize(new File(path, "/.omni/objects"), tree.getSHA1());
             stage.contents.put(tree.getPath(), tree);
         } else {
             Blob blob = new Blob(file);
-            blob.serialize(objectsDir, blob.getSHA1());
+            blob.serialize(new File(path, "/.omni/objects"), blob.getSHA1());
             stage.contents.put(blob.getPath(), blob);
         }
     }
@@ -128,27 +129,29 @@ public class OmniRepo {
      * @param message
      * @throws FileNotFoundException
      */
-    public void commit(String message) throws IOException {
+    public Commit commit(String message) throws IOException {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         if (stage.contents.isEmpty()) {
             throw new IllegalStateException("No changes added to commit (use 'omni add')");
         }
-        commit(stage.head, message, getStagedFiles());
+        return commit(stage.head, message, getStagedFiles());
     }
 
-    private void commit(Commit parent, String message, List<String> tracked) throws FileNotFoundException {
+    private Commit commit(Commit parent, String message, List<String> tracked) throws FileNotFoundException {
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
 
         Tree root = new Tree(new File(pwdPath), getStagedObjects());
         Commit commit = new Commit(root, parent, message, tracked);
 
-        root.serialize(objectsDir, root.getSHA1());
-        commit.serialize(objectsDir, commit.getSHA1());
+        root.serialize(new File(path, "/.omni/objects"), root.getSHA1());
+        commit.serialize(new File(path, "/.omni/objects"), commit.getSHA1());
         stage.head = commit;
         stage.contents.clear();
+
+        return commit;
     }
 
     /**
@@ -211,6 +214,7 @@ public class OmniRepo {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
+        File objectsDir = new File(path, "/.omni/objects");
         for (File file: objectsDir.listFiles()) {
             if (file.getName().startsWith("C")) {
                 Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
@@ -236,6 +240,7 @@ public class OmniRepo {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         int count = 0;
+        File objectsDir = new File(path, "/.omni/objects");
         for (File file: objectsDir.listFiles()) {
             if (file.getName().startsWith("C")) {
                 Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
@@ -360,7 +365,7 @@ public class OmniRepo {
     private static class Stage implements Serializable {
         private String path;
         private Commit head;
-        private Commit branch;
+        private Branch branch;
         private Map<String, OmniObject> contents;
 
         private Stage(String path) {
