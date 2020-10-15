@@ -1,6 +1,7 @@
 package src.test;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -15,8 +16,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
-import static org.junit.Assert.*;
 
 public class TestOmniRepo {
     private String mockDirPath;
@@ -50,23 +49,29 @@ public class TestOmniRepo {
     @Test
     public void initShouldCreateDirectoryAndSubdirectories() throws IOException {
         mockOmniRepo.init();
-        assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/objects/")));
-        assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/branches/")));
-        assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/refs/heads")));
-        assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/HEAD")));
+        Assert.assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/objects/")));
+        Assert.assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/branches/")));
+        Assert.assertTrue(Files.isDirectory(Paths.get(mockDirPath, "/.omni/refs/heads")));
+        Assert.assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/HEAD")));
+    }
+
+    @Test
+    public void initShouldCreateMasterInBranchesDir() throws IOException {
+        mockOmniRepo.init();
+        Assert.assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/branches/master")));
     }
 
     @Test
     public void initShouldSetProperFileContents() throws IOException {
         mockOmniRepo.init();
         byte[] headContents = Utils.readContents(new File(mockDirPath, "/.omni/HEAD"));
-        assertEquals(new String(headContents, StandardCharsets.UTF_8), "ref: refs/heads/master\n");
+        Assert.assertEquals(new String(headContents, StandardCharsets.UTF_8), "ref: refs/heads/master\n");
     }
 
     @Test
     public void initShouldCreateAnInitialCommitAndTree() throws IOException {
         mockOmniRepo.init();
-        assertEquals(2, mockObjectsDir.list().length);
+        Assert.assertEquals(2, mockObjectsDir.list().length);
     }
 
     @Test(expected = Exception.class)
@@ -84,7 +89,7 @@ public class TestOmniRepo {
 
         File mockFile = mockDir.newFile("foo.txt");
         mockOmniRepo.add("foo.txt");
-        assertEquals(3, mockObjectsDir.list().length);
+        Assert.assertEquals(3, mockObjectsDir.list().length);
     }
 
     @Test
@@ -95,7 +100,7 @@ public class TestOmniRepo {
             File mockFile = mockDir.newFile(fileNames[i]);
             saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
-            assertEquals(3, mockObjectsDir.list().length);
+            Assert.assertEquals(3, mockObjectsDir.list().length);
         }
     }
 
@@ -114,7 +119,7 @@ public class TestOmniRepo {
             saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
         }
-        assertEquals(4, mockObjectsDir.list().length);
+        Assert.assertEquals(4, mockObjectsDir.list().length);
     }
 
     @Test
@@ -130,7 +135,7 @@ public class TestOmniRepo {
             bw.close();
             saveStateBetweenCommands();
             mockOmniRepo.add(fileNames[i]);
-            assertEquals(3, mockObjectsDir.list().length);
+            Assert.assertEquals(3, mockObjectsDir.list().length);
         }
     }
 
@@ -151,7 +156,7 @@ public class TestOmniRepo {
 
         saveStateBetweenCommands();
         mockOmniRepo.add("Temp");
-        assertEquals(5, mockObjectsDir.list().length);
+        Assert.assertEquals(5, mockObjectsDir.list().length);
     }
 
     @Test
@@ -174,11 +179,11 @@ public class TestOmniRepo {
 
         saveStateBetweenCommands();
         mockOmniRepo.add("TempA");
-        assertEquals(5, mockObjectsDir.list().length);
+        Assert.assertEquals(5, mockObjectsDir.list().length);
 
         saveStateBetweenCommands();
         mockOmniRepo.add("TempB");
-        assertEquals(5, mockObjectsDir.list().length);
+        Assert.assertEquals(5, mockObjectsDir.list().length);
     }
 
     @Test
@@ -194,7 +199,7 @@ public class TestOmniRepo {
             bw.close();
             saveStateBetweenCommands();
             mockOmniRepo.add(mockFile.getName());
-            assertEquals(1, mockOmniRepo.getStagedFiles().size());
+            Assert.assertEquals(1, mockOmniRepo.getStagedFiles().size());
         }
     }
 
@@ -223,7 +228,7 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         mockOmniRepo.commit("Committed foo!");
-        assertEquals(5, mockObjectsDir.list().length);
+        Assert.assertEquals(5, mockObjectsDir.list().length);
     }
 
     @Test
@@ -236,7 +241,7 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         mockOmniRepo.commit("Committed foo!");
-        assertTrue(mockOmniRepo.getStagedFiles().isEmpty());
+        Assert.assertTrue(mockOmniRepo.getStagedFiles().isEmpty());
     }
 
     @Test (expected = Exception.class)
@@ -264,7 +269,7 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         mockOmniRepo.rm("foo.txt");
-        assertTrue(mockOmniRepo.getStagedFiles().isEmpty());
+        Assert.assertTrue(mockOmniRepo.getStagedFiles().isEmpty());
     }
 
     @Test
@@ -280,7 +285,7 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         mockOmniRepo.rm("foo.txt");
-        assertTrue(mockOmniRepo.getTrackedFiles().isEmpty());
+        Assert.assertTrue(mockOmniRepo.getTrackedFiles().isEmpty());
     }
 
     @Test
@@ -303,8 +308,8 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         mockOmniRepo.commit("Committing bar.txt");
-        assertFalse(mockOmniRepo.getHead().getTracked().contains(mockFile1.getAbsolutePath()));
-        assertTrue(mockOmniRepo.getHead().getTracked().contains(mockFile2.getAbsolutePath()));
+        Assert.assertFalse(mockOmniRepo.getHead().getTracked().contains(mockFile1.getAbsolutePath()));
+        Assert.assertTrue(mockOmniRepo.getHead().getTracked().contains(mockFile2.getAbsolutePath()));
     }
 
     @Test
@@ -319,9 +324,9 @@ public class TestOmniRepo {
         mockOmniRepo.commit("Committing foo.txt");
         saveStateBetweenCommands();
 
-        assertTrue(Files.exists(Paths.get(mockDirPath, mockFile.getName())));
+        Assert.assertTrue(Files.exists(Paths.get(mockDirPath, mockFile.getName())));
         mockOmniRepo.rm("foo.txt");
-        assertFalse(Files.exists(Paths.get(mockDirPath, mockFile.getName())));
+        Assert.assertFalse(Files.exists(Paths.get(mockDirPath, mockFile.getName())));
     }
 
     @Test (expected = Exception.class)
@@ -365,7 +370,7 @@ public class TestOmniRepo {
         mockOmniRepo.init();
         saveStateBetweenCommands();
         int count = mockOmniRepo.find("Initial commit");
-        assertEquals(1, count);
+        Assert.assertEquals(1, count);
     }
 
     @Test
@@ -388,7 +393,7 @@ public class TestOmniRepo {
             mockOmniRepo.commit("Committing a file!");
 
             saveStateBetweenCommands();
-            assertEquals(i+1, mockOmniRepo.find("Committing a file!"));
+            Assert.assertEquals(i+1, mockOmniRepo.find("Committing a file!"));
         }
     }
 
@@ -407,7 +412,7 @@ public class TestOmniRepo {
             mockOmniRepo.commit("Committing a file!");
             saveStateBetweenCommands();
 
-            assertEquals(1, mockOmniRepo.find("Committing a file!"));
+            Assert.assertEquals(1, mockOmniRepo.find("Committing a file!"));
         }
     }
 
@@ -441,7 +446,7 @@ public class TestOmniRepo {
         mockOmniRepo.add("foo.txt");
         saveStateBetweenCommands();
         mockOmniRepo.status();
-        assertTrue(false); // TODO: Delete this test!
+        Assert.assertTrue(false); // TODO: Delete this test!
     }
 
     @Test (expected = Exception.class)

@@ -34,8 +34,6 @@ public class OmniRepo {
         this.path = path;
         if (Files.exists(Paths.get(path, ".omni/index"))) {
             this.stage = Stage.deserialize(path);
-        } else {
-            this.stage = new Stage(path);
         }
     }
 
@@ -60,6 +58,7 @@ public class OmniRepo {
      *
      */
     public void saveState() {
+        stage.branch.serialize(new File(String.valueOf(Paths.get(path, "/.omni/branches/"))));
         stage.serialize();
     }
 
@@ -85,12 +84,18 @@ public class OmniRepo {
         fw.write("ref: refs/heads/master\n");
         fw.close();
 
-        Commit head = commit(null, "Initial commit", null);
-        stage.head = head;
+        String pwdPath = System.getProperty("user.dir") + path;
+        new File(pwdPath).mkdirs();
 
+        Tree root = new Tree(new File(pwdPath), new ArrayList<>());
+        Commit head = new Commit(root, null, "Initial commit", null);
         Branch master = new Branch("master", head);
-        stage.branch = master;
 
+        root.serialize(new File(path, "/.omni/objects"), root.getSHA1());
+        head.serialize(new File(path, "/.omni/objects"), head.getSHA1());
+        master.serialize(new File(String.valueOf(Paths.get(path, "/.omni/branches"))));
+
+        stage = new Stage(path, head, master);
         System.out.println("Initialized empty Omni repository in " + System.getProperty("user.dir") + path);
     }
 
@@ -136,19 +141,19 @@ public class OmniRepo {
         if (stage.contents.isEmpty()) {
             throw new IllegalStateException("No changes added to commit (use 'omni add')");
         }
-        return commit(stage.head, message, getStagedFiles());
-    }
-
-    private Commit commit(Commit parent, String message, List<String> tracked) throws FileNotFoundException {
         String pwdPath = System.getProperty("user.dir") + path;
         new File(pwdPath).mkdirs();
 
         Tree root = new Tree(new File(pwdPath), getStagedObjects());
-        Commit commit = new Commit(root, parent, message, tracked);
+        Commit commit = new Commit(root, stage.head, message, getStagedFiles());
 
         root.serialize(new File(path, "/.omni/objects"), root.getSHA1());
         commit.serialize(new File(path, "/.omni/objects"), commit.getSHA1());
-        stage.head = commit;
+
+        if (!commit.getSHA1().equals(stage.head.getSHA1())) {
+            stage.head = commit;
+            stage.branch.setCommit(commit);
+        }
         stage.contents.clear();
 
         return commit;
@@ -214,11 +219,13 @@ public class OmniRepo {
         if (!isInitialized()) {
             throw new FileNotFoundException("Omni directory not initialized");
         }
-        File objectsDir = new File(path, "/.omni/objects");
-        for (File file: objectsDir.listFiles()) {
-            if (file.getName().startsWith("C")) {
-                Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
+        File branchesDir = new File(path, "/.omni/branches");
+        for (File branchFile: branchesDir.listFiles()) {
+            Branch branch = Branch.deserialize(branchesDir, branchFile.getName());
+            Commit curr = branch.getCommit();
+            while (curr != null) {
                 logCommitContents(curr);
+                curr = curr.getParent();
             }
         }
     }
@@ -240,14 +247,16 @@ public class OmniRepo {
             throw new FileNotFoundException("Omni directory not initialized");
         }
         int count = 0;
-        File objectsDir = new File(path, "/.omni/objects");
-        for (File file: objectsDir.listFiles()) {
-            if (file.getName().startsWith("C")) {
-                Commit curr = (Commit) OmniObject.deserialize(objectsDir, file.getName());
+        File branchesDir = new File(path, "/.omni/branches");
+        for (File branchFile: branchesDir.listFiles()) {
+            Branch branch = Branch.deserialize(branchesDir, branchFile.getName());
+            Commit curr = branch.getCommit();
+            while (curr != null) {
                 if (curr.getMessage().equals(msg)) {
                     System.out.println(curr.getSHA1());
                     count++;
                 }
+                curr = curr.getParent();
             }
         }
         if (count == 0) {
@@ -356,7 +365,7 @@ public class OmniRepo {
     }
 
     private boolean isInitialized() {
-        return Files.isDirectory(Paths.get(path, "/.omni/"));
+        return stage != null;
     }
 
     /**
@@ -368,10 +377,10 @@ public class OmniRepo {
         private Branch branch;
         private Map<String, OmniObject> contents;
 
-        private Stage(String path) {
+        private Stage(String path, Commit head, Branch branch) {
             this.path = path;
-            this.head = null;
-            this.branch = null;
+            this.head = head;
+            this.branch = branch;
             this.contents = new HashMap<>();
         }
 

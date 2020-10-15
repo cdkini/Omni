@@ -42,4 +42,8 @@ public class Branch implements Serializable {
         }
         return branch;
     }
+
+    public void setCommit(Commit commit) {
+        this.commit = commit;
+    }
 }
