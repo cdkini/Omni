@@ -1,4 +1,4 @@
-![Omni logo](img/logo.png)
+<img src="img/logo.jpg" style="width: 50%; height: 50%"/>
 <h2 align="center"><i>Keeping an Eye on Your Code So You Don't Have To</i></h2>
 
 <p align="center">
