@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 public class Blob extends OmniObject implements Serializable {
     private File file;
     private byte[] contents;
+    private String sha1;
 
     /**
      * TODO: Write docstring!
@@ -23,6 +24,7 @@ public class Blob extends OmniObject implements Serializable {
         }
         this.file = file;
         this.contents = Utils.readContents(file);
+        this.sha1 = "B"+Utils.sha1((Object) Utils.readContents(file));
     }
 
     /**
@@ -31,7 +33,7 @@ public class Blob extends OmniObject implements Serializable {
      */
     @Override
     public String getSHA1() {
-        return "B"+Utils.sha1(Utils.readContents(file));
+        return sha1;
     }
 
     @Override

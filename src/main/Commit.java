@@ -15,6 +15,7 @@ public class Commit extends OmniObject implements Serializable {
     private long timeStamp;
     private String message;
     private List<String> tracked;
+    private String sha1;
 
     /**
      * TODO: Write docstring!
@@ -29,6 +30,7 @@ public class Commit extends OmniObject implements Serializable {
         this.timeStamp = new Date().getTime();
         this.message = message;
         this.tracked = tracked;
+        this.sha1 = "C"+Utils.sha1(root.getSHA1());
     }
 
     /**
@@ -61,7 +63,7 @@ public class Commit extends OmniObject implements Serializable {
      */
     @Override
     public String getSHA1()  {
-        return "C"+Utils.sha1(root.getSHA1());
+        return sha1;
     }
 
     @Override

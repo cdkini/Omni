@@ -336,16 +336,40 @@ public class OmniRepo {
      * TODO: Write docstring!
      * @param branchName
      */
-    public void branch(String branchName) {
-        // TODO: FILL IN
+    public void branch(String branchName) throws FileNotFoundException, FileAlreadyExistsException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        File branchesDir = new File(path, "/.omni/branches");
+        for (File branchFile: branchesDir.listFiles()) {
+            if (branchName.equals(branchFile.getName())) {
+                throw new FileAlreadyExistsException("A branch with that name already exists");
+            }
+        }
+        Branch newBranch = new Branch(branchName, stage.head);
+        newBranch.serialize(new File(String.valueOf(Paths.get(path, "/.omni/branches"))));
     }
 
     /**
      * TODO: Write docstring!
      * @param branchName
      */
-    public void rmBranch(String branchName) {
-        // TODO: FILL IN
+    public void rmBranch(String branchName) throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        if (branchName.equals("master")) {
+            throw new IllegalArgumentException("Cannot rm master branch");
+        }
+        if (branchName.equals(stage.branch.getName())) {
+            throw new IllegalArgumentException("Cannot rm current branch");
+        }
+        File branchFile = new File(String.valueOf(Paths.get(path, "/.omni/branches/", branchName)));
+        if (branchFile.delete()) {
+            System.out.println("Rm "+branchName);
+        } else {
+            throw new FileNotFoundException("A branch with that name does not exist");
+        }
     }
 
     /**

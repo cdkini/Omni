@@ -9,11 +9,9 @@ import org.junit.rules.TemporaryFolder;
 import src.main.OmniRepo;
 import src.main.Utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -290,10 +288,14 @@ public class TestOmniRepo {
 
     @Test
     public void rmTrackedFileShouldNotBeIncludedInSubsequentCommit() throws IOException {
+        BufferedWriter bw;
         mockOmniRepo.init();
         saveStateBetweenCommands();
 
         File mockFile1 = mockDir.newFile("foo.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile1.getPath(), true));
+        bw.write("Writing message in foo!");
+        bw.close();
         mockOmniRepo.add("foo.txt");
         saveStateBetweenCommands();
 
@@ -304,6 +306,9 @@ public class TestOmniRepo {
         saveStateBetweenCommands();
 
         File mockFile2 = mockDir.newFile("bar.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile2.getPath(), true));
+        bw.write("Writing message in bar!");
+        bw.close();
         mockOmniRepo.add("bar.txt");
         saveStateBetweenCommands();
 
@@ -438,17 +443,6 @@ public class TestOmniRepo {
 
     // OmniRepo.status__________________________________________________________________________________________________
 
-    @Test
-    public void temp() throws IOException {
-        mockOmniRepo.init();
-        saveStateBetweenCommands();
-        File mockFile1 = mockDir.newFile("foo.txt");
-        mockOmniRepo.add("foo.txt");
-        saveStateBetweenCommands();
-        mockOmniRepo.status();
-        Assert.assertTrue(false); // TODO: Delete this test!
-    }
-
     @Test (expected = Exception.class)
     public void statusInUninitializedDirectoryShouldFail() throws IOException {
         mockOmniRepo.status();
@@ -458,7 +452,73 @@ public class TestOmniRepo {
 
     // OmniRepo.branch__________________________________________________________________________________________________
 
+    @Test
+    public void branchCreatesHashFileInBranchesDir() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.branch("feature");
+        Assert.assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/branches/feature")));
+    }
+
+    @Test (expected = Exception.class)
+    public void branchOfSameNameAsExistingBranchShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.branch("master");
+    }
+
+    @Test (expected = Exception.class)
+    public void branchInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.branch("abc");
+    }
+
     // OmniRepo.rmBranch________________________________________________________________________________________________
+
+    @Test
+    public void rmBranchDeletesHashFileInBranchesDir() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        mockOmniRepo.branch("abc");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(Files.exists(Paths.get(mockDirPath, "/.omni/branches/abc")));
+        mockOmniRepo.rmBranch("abc");
+        Assert.assertFalse(Files.exists(Paths.get(mockDirPath, "/.omni/branches/abc")));
+    }
+
+    @Test (expected = Exception.class)
+    public void rmBranchOfMasterShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.rmBranch("master");
+    }
+
+    @Test (expected = Exception.class)
+    public void rmBranchOfCurrentBranchShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        mockOmniRepo.branch("abc");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.checkOutBranch("abc"); // FIXME: Open to implement to get test to work
+        saveStateBetweenCommands();
+
+        mockOmniRepo.rmBranch("abc");
+    }
+
+    @Test (expected = Exception.class)
+    public void rmBranchOfNonexistentBranchShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.rmBranch("fakeBranch");
+    }
+
+    @Test (expected = Exception.class)
+    public void rmBranchInUninitializedDirectoryShouldFail() throws IOException {
+        mockOmniRepo.rmBranch("abc");
+    }
 
     // OmniRepo.reset___________________________________________________________________________________________________
 

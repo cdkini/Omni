@@ -14,6 +14,7 @@ import java.util.List;
 public class Tree extends OmniObject implements Serializable {
     private File dir;
     private List<OmniObject> children;
+    private String sha1;
 
     /**
      * TODO: Write docstring!
@@ -32,6 +33,12 @@ public class Tree extends OmniObject implements Serializable {
                 this.children.add(new Blob(file));
             }
         }
+        StringBuilder sb = new StringBuilder();
+        sb.append('T');
+        for (OmniObject obj: children) {
+            sb.append(obj.getSHA1());
+        }
+        sha1 = sb.toString();
     }
 
     /**
@@ -45,6 +52,12 @@ public class Tree extends OmniObject implements Serializable {
         }
         this.dir = dir;
         this.children = objs;
+        StringBuilder sb = new StringBuilder();
+        sb.append('T');
+        for (OmniObject obj: children) {
+            sb.append(obj.getSHA1());
+        }
+        sha1 = sb.toString();
     }
 
     public List<OmniObject> getChildren() {
@@ -58,12 +71,7 @@ public class Tree extends OmniObject implements Serializable {
      */
     @Override
     public String getSHA1() {
-        StringBuilder sha1 = new StringBuilder();
-        sha1.append('T');
-        for (OmniObject obj: children) {
-            sha1.append(obj.getSHA1());
-        }
-        return sha1.toString();
+        return sha1;
     }
 
     @Override
