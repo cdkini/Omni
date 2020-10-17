@@ -1,4 +1,4 @@
-<img src="https://github.com/cdkini/Omni/blob/master/img/logo.png" style="width: 50%; height: 50%"/>
+![Omni logo](img/logo.png)
 <h2 align="center"><i>Keeping an Eye on Your Code So You Don't Have To</i></h2>
 
 <p align="center">
