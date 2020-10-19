@@ -311,7 +311,7 @@ public class OmniRepo {
      * TODO: Write docstring!
      * @param fileName
      */
-    public void checkOutFile(String fileName) {
+    public void checkoutFile(String fileName) {
         // TODO: FILL IN
     }
 
@@ -320,7 +320,7 @@ public class OmniRepo {
      * @param commmitID
      * @param filename
      */
-    public void checkOutCommit(String commmitID, String filename) {
+    public void checkoutCommit(String commitID, String fileName) {
         // TODO: FILL IN
     }
 
@@ -328,8 +328,21 @@ public class OmniRepo {
      * TODO: Write docstring!
      * @param branchName
      */
-    public void checkOutBranch(String branchName) {
-        // TODO: FILL IN
+    public void checkoutBranch(String branchName) throws FileNotFoundException {
+        if (!isInitialized()) {
+            throw new FileNotFoundException("Omni directory not initialized");
+        }
+        if (branchName.equals(stage.branch.getName())) {
+            throw new IllegalArgumentException("Cannot rm current branch");
+        }
+        File branchesDir = new File(path, "/.omni/branches");
+        try {
+            Branch branch = Branch.deserialize(branchesDir, branchName);
+            stage.branch = branch;
+            stage.head = branch.getCommit();
+        } catch (Error e) {
+            throw new FileNotFoundException("A branch with that name does not exist");
+        }
     }
 
     /**
@@ -390,6 +403,10 @@ public class OmniRepo {
 
     private boolean isInitialized() {
         return stage != null;
+    }
+
+    public Branch getCurrBranch() {
+        return stage.branch;
     }
 
     /**

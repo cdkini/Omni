@@ -1,17 +1,12 @@
 package src.test;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TemporaryFolder;
 import src.main.OmniRepo;
 import src.main.Utils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -426,7 +421,7 @@ public class TestOmniRepo {
         mockOmniRepo.init();
         saveStateBetweenCommands();
 
-        File mockFile1 = mockDir.newFile("foo.txt");
+        File mockFile = mockDir.newFile("foo.txt");
         mockOmniRepo.add("foo.txt");
         saveStateBetweenCommands();
 
@@ -448,7 +443,163 @@ public class TestOmniRepo {
         mockOmniRepo.status();
     }
 
-    // OmniRepo.checkout________________________________________________________________________________________________
+    // OmniRepo.checkoutFile____________________________________________________________________________________________
+
+    // OmniRepo.checkoutCommit__________________________________________________________________________________________
+
+    // OmniRepo.checkoutBranch__________________________________________________________________________________________
+
+    @Test
+    public void checkoutBranchShouldChangeBranchInStage() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        mockOmniRepo.branch("abc");
+        saveStateBetweenCommands();
+        Assert.assertEquals("master", mockOmniRepo.getCurrBranch().getName());
+
+        mockOmniRepo.checkoutBranch("abc");
+        Assert.assertEquals("abc", mockOmniRepo.getCurrBranch().getName());
+    }
+
+    @Test public void checkoutBranchShouldChangeHeadInStage() throws IOException {
+        mockOmniRepo.init();
+        String masterHead = mockOmniRepo.getHead().getSHA1();
+        saveStateBetweenCommands();
+
+        mockOmniRepo.branch("abc");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.checkoutBranch("abc");
+        saveStateBetweenCommands();
+        Assert.assertEquals(masterHead, mockOmniRepo.getHead().getSHA1());
+
+        File mockFile1 = mockDir.newFile("foo.txt");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(mockFile1.getPath(), true));
+        bw.write("This is foo!");
+        bw.close();
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Initial commit in abc branch");
+        saveStateBetweenCommands();
+        Assert.assertNotEquals(masterHead, mockOmniRepo.getHead().getSHA1());
+
+        mockOmniRepo.checkoutBranch("master");
+        saveStateBetweenCommands();
+        Assert.assertEquals(masterHead, mockOmniRepo.getHead().getSHA1());
+    }
+
+    @Test
+    public void checkoutBranchShouldNotTrackSameFilesAsOriginalBranch() throws IOException {
+        BufferedWriter bw;
+        File mockFile1 = mockDir.newFile("foo.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile1.getPath(), true));
+        bw.write("This is foo!");
+        bw.close();
+
+        File mockFile2 = mockDir.newFile("bar.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile2.getPath(), true));
+        bw.write("This is bar!");
+        bw.close();
+
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Initial commit in master branch");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile1.getName()));
+        Assert.assertFalse(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile2.getName()));
+
+        mockOmniRepo.branch("testBranch");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.checkoutBranch("testBranch");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.add("bar.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Second commit in testBranch branch");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile1.getName()));
+        Assert.assertTrue(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile2.getName()));
+
+        mockOmniRepo.checkoutBranch("master");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile1.getName()));
+        Assert.assertFalse(mockOmniRepo.getCurrBranch().getCommit().getTracked().contains(mockFile2.getName()));
+    }
+
+    @Test
+    public void checkoutBranchShouldNotContainSameFilesInRootDirAsOriginalBranch() throws IOException {
+        BufferedWriter bw;
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+
+        File mockFile1 = mockDir.newFile("foo.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile1.getPath(), true));
+        bw.write("This is foo!");
+        bw.close();
+        mockOmniRepo.add("foo.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Initial commit in master branch");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "foo.txt")));
+        Assert.assertFalse(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "bar.txt")));
+
+        mockOmniRepo.branch("testBranch");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.checkoutBranch("testBranch");
+        saveStateBetweenCommands();
+
+        File mockFile2 = mockDir.newFile("bar.txt");
+        bw = new BufferedWriter(new FileWriter(mockFile2.getPath(), true));
+        bw.write("This is bar!");
+        bw.close();
+        mockOmniRepo.add("bar.txt");
+        saveStateBetweenCommands();
+
+        mockOmniRepo.commit("Second commit in testBranch branch");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "foo.txt")));
+        Assert.assertTrue(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "bar.txt")));
+
+        mockOmniRepo.checkoutBranch("master");
+        saveStateBetweenCommands();
+
+        Assert.assertTrue(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "foo.txt")));
+        Assert.assertFalse(Files.exists(Paths.get(mockObjectsDir.getAbsolutePath(), "bar.txt")));
+    }
+
+    @Test (expected = Exception.class)
+    public void checkoutBranchOfCurrentBranchShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.checkoutBranch("master");
+    }
+
+    @Test (expected = Exception.class)
+    public void checkoutBranchInUninitializedDirectoryShouldFail() throws FileNotFoundException {
+        mockOmniRepo.checkoutBranch("master");
+    }
+
+    @Test (expected = Exception.class)
+    public void checkoutBranchOfNonexistentBranchShouldFail() throws IOException {
+        mockOmniRepo.init();
+        saveStateBetweenCommands();
+        mockOmniRepo.checkoutBranch("fakeBranch");
+    }
 
     // OmniRepo.branch__________________________________________________________________________________________________
 
@@ -502,7 +653,7 @@ public class TestOmniRepo {
         mockOmniRepo.branch("abc");
         saveStateBetweenCommands();
 
-        mockOmniRepo.checkOutBranch("abc"); // FIXME: Open to implement to get test to work
+        mockOmniRepo.checkoutBranch("abc"); // FIXME: Open to implement to get test to work
         saveStateBetweenCommands();
 
         mockOmniRepo.rmBranch("abc");
