@@ -1,0 +1,12 @@
+Methods
+- rmBranch
+- checkoutFile
+- checkoutCommit
+- reset
+- merge
+
+Misc
+- Travis CI
+- INSTALL
+- saveStateBetweenCommands code smell
+- Docstrings
