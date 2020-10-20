@@ -17,8 +17,9 @@ public class Tree extends OmniObject implements Serializable {
     private String sha1;
 
     /**
-     * TODO: Write docstring!
-     * @param dir
+     * Default constructor.
+     *
+     * @param dir contains the contents to be serialized in the instance.
      */
     public Tree(File dir) throws FileNotFoundException {
         if (!dir.isDirectory()) {
@@ -42,9 +43,14 @@ public class Tree extends OmniObject implements Serializable {
     }
 
     /**
-     * TODO: Write docstring!
-     * @param dir
-     * @param objs
+     * Constructor used during OmniRepo instantiation or committing to represent the overall repository.
+     * Similar to {@link Tree#Tree(File)} but allows children to be provided as an argument.
+     *
+     * @param dir contains the contents to be serialized in the instance.
+     * @param objs is a list of children to be associated with the instance.
+     *
+     * @see OmniRepo#init()
+     * @see OmniRepo#commit(String)
      */
     public Tree(File dir, List<OmniObject> objs) {
         if (!dir.isDirectory()) {
@@ -60,15 +66,6 @@ public class Tree extends OmniObject implements Serializable {
         sha1 = sb.toString();
     }
 
-    public List<OmniObject> getChildren() {
-        return children;
-    }
-
-    /**
-     * FIXME: Update SHA1 for tree (issues created by nested directories)
-     * TODO: Write docstring!
-     * @return
-     */
     @Override
     public String getSHA1() {
         return sha1;
@@ -82,5 +79,9 @@ public class Tree extends OmniObject implements Serializable {
     @Override
     public String getName() {
         return dir.getName();
+    }
+
+    public List<OmniObject> getChildren() {
+        return children;
     }
 }

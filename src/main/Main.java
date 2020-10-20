@@ -3,13 +3,15 @@ package src.main;
 import java.io.IOException;
 
 /**
- * TODO: Write docstring!
+ * Main brings together the classes and objects from the rest of project, allowing user inputs to be read and evaluated.
  */
 public class Main {
     /**
-     * TODO: Write docstring!
-     * @param args
-     * @throws IOException
+     * Takes in user input and determines the appropriate command to run. An OmniObject is instantiated during program
+     * execution and is serialized to the .omni directory at program completion.
+     *
+     * @param args are the arguments passed by the user in the CLI.
+     * @throws IOException if the args are invalid or if there is any other issue during program execution.
      */
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {

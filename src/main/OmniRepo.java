@@ -18,17 +18,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * TODO: Write docstring!
+ * OmniRepo acts as the central class for the project, enabling version-control through various methods. It is also
+ * responsible for persistence between commands, storing objects and their contents as serialized files in a .omni
+ * directory.
  */
 public class OmniRepo {
     private String path;
     private Stage stage;
 
     /**
-     * TODO: Write docstring!
+     * Default constructor.
      *
-     * @param path
-     * @throws IOException
+     * @param path is the directory where our .omni directory is to be located. By default, it is pwd but can be changed
+     *             for testing.
+     * @throws IOException if the provided path is invalid.
      */
     public OmniRepo(String path) throws IOException {
         this.path = path;
@@ -37,25 +40,9 @@ public class OmniRepo {
         }
     }
 
-    public Commit getHead() {
-        return stage.head;
-    }
-
-    public List<String> getTrackedFiles() {
-        return stage.head.getTracked();
-    }
-
-    public List<String> getStagedFiles() {
-        return new ArrayList<>(stage.contents.keySet());
-    }
-
-    public List<OmniObject> getStagedObjects() {
-        return new ArrayList<>(stage.contents.values());
-    }
-
     /**
-     * TODO: Write docstring!
-     *
+     * Serializes the current branch to the .omni/branches dir and the stage to .omni/index. To be invoked between
+     * commands to create persistence.
      */
     public void saveState() {
         stage.branch.serialize(new File(String.valueOf(Paths.get(path, "/.omni/branches/"))));
@@ -100,8 +87,7 @@ public class OmniRepo {
     }
 
     /**
-     * Adds a file to the staging area and serializes it the .omni/objects directory as a 40-char encrypted hash.
-     * file.getAbsolutePath()
+     * Adds a file to the staging area and serializes it the .omni/objects directory as a 41-char encrypted hash.
      *
      * @param fileName is the name of the file that's added ArrayListto the staging area and serialized into a file.
      * @throws FileNotFoundException if the added file does not exist.
@@ -131,8 +117,9 @@ public class OmniRepo {
 
     /**
      * TODO: Write docstring!
-     * @param message
-     * @throws FileNotFoundException
+     *
+     * @param message used to describe the contents of the commit.
+     * @throws FileNotFoundException if the .omni directory is not initialized.
      */
     public Commit commit(String message) throws IOException {
         if (!isInitialized()) {
@@ -405,12 +392,32 @@ public class OmniRepo {
         return stage != null;
     }
 
+    public Commit getHead() {
+        return stage.head;
+    }
+
     public Branch getCurrBranch() {
         return stage.branch;
     }
 
+    public List<String> getTrackedFiles() {
+        return stage.head.getTracked();
+    }
+
+    public List<String> getStagedFiles() {
+        return new ArrayList<>(stage.contents.keySet());
+    }
+
+    public List<OmniObject> getStagedObjects() {
+        return new ArrayList<>(stage.contents.values());
+    }
+
     /**
-     * TODO: Write docstring!
+     * Stage acts as a showcase area, keeping track of the contents to be committed. Additionally, it is responsible for
+     * keeping track of the current branch and commit.
+     * Note that Stage is only instantiated within OmniRepo as an attribute and is not be invoked elsewhere.
+     *
+     * @see OmniRepo
      */
     private static class Stage implements Serializable {
         private String path;
@@ -418,6 +425,14 @@ public class OmniRepo {
         private Branch branch;
         private Map<String, OmniObject> contents;
 
+        /**
+         * Default constructor.
+         *
+         * @param path is the directory where our .omni directory is located. By default, it is pwd but can be changed
+         *             for testing.
+         * @param head represents a pointer pointing to the current Commit.
+         * @param branch is the current Branch the user has checked out (default is 'master').
+         */
         private Stage(String path, Commit head, Branch branch) {
             this.path = path;
             this.head = head;
@@ -425,6 +440,9 @@ public class OmniRepo {
             this.contents = new HashMap<>();
         }
 
+        /**
+         * Converts the Stage into a stream of bytes and stores it in memory as the 'index' file in the .omni directory.
+         */
         private void serialize() {
             File outFile = new File(path, "/.omni/index");
             try {
@@ -436,6 +454,12 @@ public class OmniRepo {
             }
         }
 
+        /**
+         * Takes the contents of the serialized index and converts it into an instance of a Stage.
+         *
+         * @param path is the directory where our 'index' or serialized Stage instance is located.
+         * @return a Stage instance serialized in the given path.
+         */
         private static Stage deserialize(String path) {
             Stage stage;
             File inFile = new File(path, "/.omni/index");

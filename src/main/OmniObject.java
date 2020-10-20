@@ -15,7 +15,7 @@ import java.io.Serializable;
  */
 public abstract class OmniObject implements Serializable {
     /**
-     * Serialize converts an object into a stream of bytes and stores it in memory as a file.
+     * Converts an object into a stream of bytes and stores it in memory as a file.
      *
      * @param parent is the directory that your file is located in.
      * @param fileName is the name of the file you wish to deserialize.
@@ -43,7 +43,7 @@ public abstract class OmniObject implements Serializable {
     }
 
     /**
-     * Deserialize takes the contents of a serialized file and converts it into an instance of an OmniObject.
+     * Takes the contents of a serialized file and converts it into an instance of an OmniObject.
      *
      * @param parent is the directory that your file is located in.
      * @param fileName is the name of the file you wish to deserialize.
@@ -67,8 +67,11 @@ public abstract class OmniObject implements Serializable {
     }
 
     /**
-     * TODO: Write docstring!
-     * @return
+     * Returns the SHA-1 hashcode associated with the OmniObject and its contents. For purposes of this project, we can
+     * assume that collisions are not going to be present. While this is traditionally a 40-character string, we prepend
+     * a 'B', 'T', or 'C' to the hashcode to differentiate between blobs, tree, and commits, respectively.
+     *
+     * @return SHA-1 encoding as a 41-character string.
      */
     public abstract String getSHA1();
 

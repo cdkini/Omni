@@ -10,13 +10,14 @@ import java.nio.file.Paths;
  * Blob (or binary large object) is Omni's internal representation of a single file and its contents.
  */
 public class Blob extends OmniObject implements Serializable {
-    private File file;
-    private byte[] contents;
-    private String sha1;
+    private final File file;
+    private final byte[] contents;
+    private final String sha1;
 
     /**
-     * TODO: Write docstring!
-     * @param file
+     * Sole constructor.
+     *
+     * @param file contains the contents to be serialized in the instance.
      */
     public Blob(File file) throws FileNotFoundException {
         if (!Files.exists(Paths.get(file.getAbsolutePath()))) {
@@ -27,10 +28,6 @@ public class Blob extends OmniObject implements Serializable {
         this.sha1 = "B"+Utils.sha1((Object) Utils.readContents(file));
     }
 
-    /**
-     * TODO: Write docstring!
-     * @return
-     */
     @Override
     public String getSHA1() {
         return sha1;
