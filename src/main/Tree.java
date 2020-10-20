@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
+/**
  * Tree is Omni's internal representation of a directory and its contents. A single tree can contain pointers to
  * multiple other trees and blobs, creating a tree or graph-like structure used to define a repository's version
  * control history.

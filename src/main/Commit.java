@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-/*
+/**
  * Commit is Omni's internal representation of a snapshot of a repository and its staged files at a particular point in
  * time. As such, it is inclusive of metadata such as the prior commit, author, time of commit, and a commit message or
  * log. The tree that it points to is the tracked repository.
