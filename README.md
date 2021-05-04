@@ -45,17 +45,14 @@ To test out the language, visit the [official Omni playground](https://repl.it/@
 
 ## Installation
 
-
 ### Dependencies
 Omni was written on a 64-bit [Ubuntu 20.04 LTS OS](https://releases.ubuntu.com/20.04/) using [Java 11.0.6](https://www.oracle.com/java/technologies/javase/11-0-6-relnotes.html). The project uses no external dependencies so access to any version of Java 11 and bash to run `.sh` files should be all you need. 
 
 ### Building Executable
-// TODO: Open to finish writing section!
-
+Omni utilizes the JVM and the standard Java compilation process. Note that integration with build tools such as Maven or Ant are in development.
 
 ## Usage
-// TODO: Open to finish writing section!
-
+Upon building the actual executable, standard git commands such as `commit`, `branch`, and `checkout` should all work as expected! The current supported feautres as of `v1.0.0` are a bit limited in nature but should encompass the primary use cases of version control systems. Be on the lookout for updates!
 
 ## Contributing
 Although Omni was designed as an educational project, any contributions or suggestions are greatly appreciated! If you would like to contribute to the codebase, please follow these steps:
